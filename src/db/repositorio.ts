@@ -30,7 +30,10 @@ export function aIntegrante(fila: FilaIntegrante): Integrante {
   };
 }
 
-function validar(datos: DatosDeIntegrante): void {
+export function validarDatos(datos: {
+  nombre: string;
+  fechaDeCumpleanos: MesDia;
+}): void {
   if (datos.nombre.trim() === '') {
     throw new Error('El nombre no puede estar vacío');
   }
@@ -55,7 +58,7 @@ export function buscarIntegrante(db: Db, id: string): Integrante | null {
 }
 
 export function crearIntegrante(db: Db, datos: DatosDeIntegrante): Integrante {
-  validar(datos);
+  validarDatos(datos);
   const fila = db
     .insert(integrantes)
     .values({
@@ -73,7 +76,7 @@ export function crearIntegrante(db: Db, datos: DatosDeIntegrante): Integrante {
 }
 
 export function editarIntegrante(db: Db, id: string, datos: DatosDeIntegrante): Integrante {
-  validar(datos);
+  validarDatos(datos);
   const fila = db
     .update(integrantes)
     .set({
