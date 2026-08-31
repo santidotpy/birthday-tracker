@@ -1,3 +1,5 @@
+import { fileURLToPath } from 'node:url';
+import tailwindcss from '@tailwindcss/vite';
 import { tanstackStart } from '@tanstack/react-start/plugin/vite';
 import viteReact from '@vitejs/plugin-react';
 import sirv from 'sirv';
@@ -26,7 +28,12 @@ function servirRetratos(): Plugin {
 
 export default defineConfig({
   server: { port: 3000 },
-  plugins: [servirRetratos(), tanstackStart(), viteReact()],
+  // TypeScript resuelve `@/` por tsconfig, pero el escaneo de dependencias de
+  // Vite no lee esos paths: sin esto, en dev no encuentra los componentes.
+  resolve: {
+    alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
+  },
+  plugins: [servirRetratos(), tailwindcss(), tanstackStart(), viteReact()],
   test: {
     // Los tests son de Node: no cargan el entorno del navegador.
     include: ['src/**/*.test.ts'],

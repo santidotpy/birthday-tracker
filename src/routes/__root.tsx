@@ -18,13 +18,11 @@ export const Route = createRootRoute({
   ),
   notFoundComponent: () => (
     <Documento>
-      <main className="pantalla pantalla-tranquila">
-        <h1 className="proximo-titulo">
-          <span className="proximo-nombre">Esa fecha no existe</span>
-        </h1>
-        <p className="nota-vacia">
-          <a href="/">Volver a hoy</a>
-        </p>
+      <main className="aparece flex min-h-dvh flex-col items-center justify-center gap-4 p-6 text-center">
+        <h1 className="m-0 text-3xl font-bold tracking-tight sm:text-5xl">Esa fecha no existe</h1>
+        <a className="text-muted-foreground underline underline-offset-4" href="/">
+          Volver a hoy
+        </a>
       </main>
     </Documento>
   ),

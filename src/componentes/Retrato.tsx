@@ -1,10 +1,23 @@
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { cn } from '@/lib/utils';
 import type { Integrante } from '../domain/agenda.js';
 import { colorDeNombre, iniciales } from '../retratos/iniciales.js';
+
+/**
+ * El mismo Retrato se usa enorme en la pantalla de Hoy y diminuto en una fila
+ * del panel, así que el tamaño es explícito por uso.
+ */
+const TAMANOS = {
+  hero: 'w-[clamp(9rem,26vw,17rem)]',
+  medio: 'w-[clamp(5rem,12vw,7.5rem)]',
+  fila: 'w-11',
+} as const;
 
 interface Props {
   integrante: Integrante;
   /** El gorrito solo va sobre quien está cumpliendo. */
   conGorrito?: boolean;
+  tamano?: keyof typeof TAMANOS;
 }
 
 /**
@@ -12,22 +25,24 @@ interface Props {
  * nombre. El respaldo no es un caso raro: mientras el Administrador no cargue
  * a nadie con foto, es lo único que se ve.
  */
-export function Retrato({ integrante, conGorrito = false }: Props) {
+export function Retrato({ integrante, conGorrito = false, tamano = 'hero' }: Props) {
   const { retrato, nombre } = integrante;
 
   return (
-    <div className="retrato">
-      {retrato ? (
-        <img className="retrato-imagen" src={`/retratos/${retrato}`} alt="" width={400} height={400} />
-      ) : (
-        <div
-          className="retrato-iniciales"
+    <div className={cn('relative aspect-square @container', TAMANOS[tamano])}>
+      <Avatar className="size-full">
+        {retrato && <AvatarImage src={`/retratos/${retrato}`} alt="" />}
+        <AvatarFallback
+          // El color sale de la paleta contrastada de `iniciales.ts`, no de un
+          // token: es dato derivado del nombre, distinto para cada persona.
           style={{ backgroundColor: colorDeNombre(nombre) }}
-          aria-hidden="true"
+          // Contra el ancho del contenedor, nunca contra el viewport: con
+          // unidades de viewport las iniciales del panel salían gigantes.
+          className="text-[38cqi] font-semibold text-white"
         >
           {iniciales(nombre)}
-        </div>
-      )}
+        </AvatarFallback>
+      </Avatar>
       {conGorrito && <Gorrito />}
     </div>
   );

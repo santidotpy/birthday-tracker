@@ -1,64 +1,131 @@
+@import 'tailwindcss';
+
 /*
- * Un solo archivo alcanza: son cinco componentes. Las curvas y duraciones
- * salen de las decisiones de la ronda 3.
+ * Tokens de shadcn mapeados a la paleta de la app: fondo cálido, acento
+ * fucsia. El resto del estilo vive en clases de Tailwind dentro de los
+ * componentes; acá queda solo lo que no se expresa bien como utilidad.
  */
 
+/*
+ * El modo oscuro sigue al sistema, no a una clase: no hay selector de tema
+ * y la app va a vivir en una TV que nadie va a configurar.
+ */
+@custom-variant dark (@media (prefers-color-scheme: dark));
+
 :root {
-  color-scheme: light dark;
+  --radius: 0.65rem;
 
-  --fondo: #faf8f6;
-  --texto: #1a1614;
-  --texto-tenue: #6f655e;
-  --borde: #e7e0d9;
-  --acento: #d81e5b;
+  --background: #faf8f6;
+  --foreground: #1a1614;
 
-  /* Las curvas nativas de CSS son flojas; estas tienen intención. */
+  --card: #fffdfb;
+  --card-foreground: #1a1614;
+  --popover: #fffdfb;
+  --popover-foreground: #1a1614;
+
+  --primary: #d81e5b;
+  --primary-foreground: #fffafc;
+
+  --secondary: #f1ebe5;
+  --secondary-foreground: #1a1614;
+
+  --muted: #f1ebe5;
+  --muted-foreground: #6f655e;
+
+  --accent: #f1ebe5;
+  --accent-foreground: #1a1614;
+
+  --destructive: #c0392b;
+  --destructive-foreground: #fff;
+
+  --border: #e7e0d9;
+  --input: #e7e0d9;
+  --ring: #d81e5b;
+
+  /* Las curvas nativas de CSS son flojas; esta tiene intención. */
   --sale: cubic-bezier(0.23, 1, 0.32, 1);
-  --entra-sale: cubic-bezier(0.77, 0, 0.175, 1);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --fondo: #14100e;
-    --texto: #f4efea;
-    --texto-tenue: #9b8f86;
-    --borde: #2c2521;
-    --acento: #ff6b96;
+    --background: #14100e;
+    --foreground: #f4efea;
+
+    --card: #1d1815;
+    --card-foreground: #f4efea;
+    --popover: #1d1815;
+    --popover-foreground: #f4efea;
+
+    --primary: #ff6b96;
+    /* Sobre un fucsia claro el texto va oscuro: en blanco no se leería. */
+    --primary-foreground: #2b1119;
+
+    --secondary: #2c2521;
+    --secondary-foreground: #f4efea;
+
+    --muted: #2c2521;
+    --muted-foreground: #9b8f86;
+
+    --accent: #2c2521;
+    --accent-foreground: #f4efea;
+
+    --destructive: #ff6b5e;
+    --destructive-foreground: #2b1114;
+
+    --border: #2c2521;
+    --input: #2c2521;
+    --ring: #ff6b96;
   }
 }
 
-* {
-  box-sizing: border-box;
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --ease-sale: var(--sale);
 }
 
-body {
-  margin: 0;
-  background: var(--fondo);
-  color: var(--texto);
-  font-family: ui-rounded, 'SF Pro Rounded', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  -webkit-font-smoothing: antialiased;
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    color-scheme: light dark;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: ui-rounded, 'SF Pro Rounded', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
 }
 
-a {
-  color: inherit;
-}
-
-/* --- Estructura ---------------------------------------------------------- */
-
-.pantalla {
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(1.25rem, 3vw, 2rem);
-  padding: clamp(1.5rem, 5vw, 4rem);
-  text-align: center;
-
-  opacity: 1;
-  transform: none;
-  animation: aparecer 260ms var(--sale) both;
-}
+/* --- Lo que no se expresa como utilidad ---------------------------------- */
 
 /* Nada aparece de la nada: se entra desde 0.97, nunca desde 0. */
 @keyframes aparecer {
@@ -68,174 +135,23 @@ a {
   }
 }
 
-/* --- Retratos ------------------------------------------------------------ */
-
-.retratos {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: center;
-  gap: clamp(1rem, 4vw, 2.5rem);
+.aparece {
+  animation: aparecer 260ms var(--sale) both;
 }
-
-.cumpleanero {
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.cumpleanero figcaption {
-  font-size: clamp(1rem, 2.5vw, 1.35rem);
-  font-weight: 600;
-}
-
-.retrato {
-  position: relative;
-  width: clamp(9rem, 26vw, 17rem);
-  aspect-ratio: 1;
-}
-
-/* Varios cumpleañeros el mismo día: entran más chicos para que entren todos. */
-.retratos[data-cuantos='3'] .retrato,
-.retratos[data-cuantos='4'] .retrato {
-  width: clamp(7rem, 18vw, 12rem);
-}
-
-.retratos:not([data-cuantos='1']) .retrato {
-  width: clamp(8rem, 22vw, 14rem);
-}
-
-.retratos-chicos .retrato {
-  width: clamp(5rem, 12vw, 7.5rem);
-}
-
-.retrato-imagen,
-.retrato-iniciales {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
-  display: block;
-}
-
-.retrato-iniciales {
-  display: grid;
-  place-items: center;
-  color: #fff;
-  font-size: 38cqw;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  container-type: size;
-}
-
-.retrato-iniciales {
-  font-size: clamp(2rem, 11vw, 5.5rem);
-}
-
-.gorrito {
-  position: absolute;
-  top: -24%;
-  left: 50%;
-  width: 46%;
-  transform-origin: bottom center;
-  transform: translateX(-62%) rotate(-17deg);
-  pointer-events: none;
-}
-
-/* --- Textos -------------------------------------------------------------- */
-
-.saludo {
-  margin: 0;
-  font-size: clamp(1.9rem, 7vw, 4.5rem);
-  font-weight: 700;
-  line-height: 1.05;
-  letter-spacing: -0.02em;
-  text-wrap: balance;
-}
-
-.saludo-nombre {
-  color: var(--acento);
-}
-
-.nota-proximo {
-  margin: 0;
-  max-width: 34ch;
-  color: var(--texto-tenue);
-  font-size: clamp(0.9rem, 1.8vw, 1.1rem);
-  line-height: 1.5;
-  text-wrap: balance;
-}
-
-.fecha-mirada {
-  margin: 0;
-  color: var(--texto-tenue);
-  font-size: clamp(0.85rem, 1.6vw, 1rem);
-  text-transform: lowercase;
-  letter-spacing: 0.04em;
-}
-
-.proximo-titulo {
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.proximo-etiqueta {
-  color: var(--texto-tenue);
-  font-size: clamp(0.9rem, 1.8vw, 1.15rem);
-  font-weight: 400;
-}
-
-.proximo-nombre {
-  font-size: clamp(1.7rem, 6vw, 3.6rem);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  text-wrap: balance;
-}
-
-/* --- Cuenta regresiva ---------------------------------------------------- */
 
 /*
- * Sin transiciones acá: los dígitos cambian una vez por segundo y animarlos
- * los volvería ilegibles. `tabular-nums` evita que el ancho baile al contar.
+ * El gorrito se apoya sobre la cabeza, ladeado, con el ala pisando el círculo.
+ * Son porcentajes del Retrato para que funcione igual a 17rem que a 2.75rem.
  */
-.cuenta-regresiva {
-  margin: 0;
-  display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
-  font-variant-numeric: tabular-nums;
+.gorrito {
+  position: absolute;
+  top: -20%;
+  left: 11%;
+  width: 60%;
+  transform-origin: 50% 68%;
+  transform: rotate(-20deg);
+  pointer-events: none;
 }
-
-.cuenta-numero {
-  font-size: clamp(2rem, 7vw, 4rem);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-}
-
-.cuenta-unidad {
-  color: var(--texto-tenue);
-  font-size: clamp(0.9rem, 2vw, 1.2rem);
-}
-
-.cuenta-reloj {
-  font-size: clamp(1.6rem, 5vw, 3rem);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  font-variant-numeric: tabular-nums;
-}
-
-.cuenta-estatica,
-.nota-vacia {
-  margin: 0;
-  color: var(--texto-tenue);
-  font-size: clamp(0.95rem, 2vw, 1.15rem);
-}
-
-/* --- Accesibilidad ------------------------------------------------------- */
 
 /*
  * Movimiento reducido no es cero animación: se conserva el fundido, que ayuda
@@ -243,7 +159,7 @@ a {
  * El confeti se cancela desde JS.
  */
 @media (prefers-reduced-motion: reduce) {
-  .pantalla {
+  .aparece {
     animation: fundir 200ms ease both;
   }
 

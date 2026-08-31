@@ -36,14 +36,18 @@ export function CuentaRegresiva({ hasta }: Props) {
   const { dias, horas, minutos, segundos } = partes(ms);
 
   return (
-    <p className="cuenta-regresiva" role="timer">
+    // `tabular-nums` evita que el ancho baile al contar. Sin transiciones:
+    // los dígitos cambian una vez por segundo y animarlos los haría ilegibles.
+    <p className="m-0 flex items-baseline gap-2 tabular-nums" role="timer">
       {dias > 0 && (
         <>
-          <span className="cuenta-numero">{dias}</span>
-          <span className="cuenta-unidad">{dias === 1 ? 'día' : 'días'}</span>
+          <span className="text-4xl font-bold tracking-tight sm:text-6xl">{dias}</span>
+          <span className="text-muted-foreground sm:text-lg">
+            {dias === 1 ? 'día' : 'días'}
+          </span>
         </>
       )}
-      <span className="cuenta-reloj">
+      <span className="text-3xl font-semibold tracking-tight sm:text-5xl">
         {dosDigitos(horas)}:{dosDigitos(minutos)}:{dosDigitos(segundos)}
       </span>
     </p>

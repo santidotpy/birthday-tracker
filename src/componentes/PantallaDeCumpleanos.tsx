@@ -1,9 +1,13 @@
+import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
 import { type Integrante, cumpleanerosEn, proximoCumpleanos } from '../domain/agenda.js';
 import type { FechaSimple } from '../domain/fechas.js';
 import { Confetti } from './Confetti.js';
 import { CuentaRegresiva } from './CuentaRegresiva.js';
 import { Retrato } from './Retrato.js';
 import { comoISO, enCuantosDias, fechaCorta, fechaLarga, unirNombres } from './formato.js';
+
+const PANTALLA =
+  'aparece flex min-h-dvh flex-col items-center justify-center gap-5 p-6 text-center sm:gap-8 sm:p-10';
 
 interface Props {
   integrantes: Integrante[];
@@ -36,28 +40,33 @@ function Celebracion({
   fecha: FechaSimple;
   proximo: Proximo;
 }) {
+  const varios = cumpleaneros.length > 1;
+
   return (
-    <main className="pantalla pantalla-fiesta">
+    <main className={PANTALLA}>
       <Confetti clave={comoISO(fecha)} />
 
-      <div className="retratos" data-cuantos={cumpleaneros.length}>
+      <div className="flex flex-wrap items-end justify-center gap-4 sm:gap-10">
         {cumpleaneros.map((integrante) => (
-          <figure key={integrante.id} className="cumpleanero">
-            <Retrato integrante={integrante} conGorrito />
-            {cumpleaneros.length > 1 && <figcaption>{integrante.nombre}</figcaption>}
+          <figure key={integrante.id} className="m-0 flex flex-col items-center gap-3">
+            <Retrato integrante={integrante} conGorrito tamano={varios ? 'medio' : 'hero'} />
+            {varios && <figcaption className="text-lg font-semibold">{integrante.nombre}</figcaption>}
           </figure>
         ))}
       </div>
 
-      <h1 className="saludo">
-        <span className="saludo-feliz">¡Feliz cumpleaños,</span>{' '}
-        <span className="saludo-nombre">{unirNombres(cumpleaneros.map((i) => i.nombre))}!</span>
+      <h1 className="m-0 text-3xl leading-tight font-bold tracking-tight text-balance sm:text-5xl lg:text-7xl">
+        ¡Feliz cumpleaños,{' '}
+        <span className="text-primary">{unirNombres(cumpleaneros.map((i) => i.nombre))}!</span>
       </h1>
 
       {proximo && (
-        <p className="nota-proximo">
-          El próximo cumpleaños es de <strong>{unirNombres(proximo.integrantes.map((i) => i.nombre))}</strong>,{' '}
-          {enCuantosDias(proximo.dias)}.
+        <p className="m-0 max-w-[34ch] leading-relaxed text-balance text-muted-foreground">
+          El próximo cumpleaños es de{' '}
+          <strong className="font-semibold text-foreground">
+            {unirNombres(proximo.integrantes.map((i) => i.nombre))}
+          </strong>
+          , {enCuantosDias(proximo.dias)}.
         </p>
       )}
     </main>
@@ -74,8 +83,8 @@ function DiaTranquilo({
   proximo: Proximo;
 }) {
   return (
-    <main className="pantalla pantalla-tranquila">
-      <p className="fecha-mirada">
+    <main className={PANTALLA}>
+      <p className="m-0 text-sm tracking-wide lowercase text-muted-foreground">
         <time dateTime={comoISO(fecha)}>{esHoy ? 'Hoy' : fechaLarga(fecha)}</time>
         {' · '}
         {esHoy ? fechaCorta(fecha) : 'sin cumpleaños'}
@@ -83,15 +92,17 @@ function DiaTranquilo({
 
       {proximo ? (
         <>
-          <div className="retratos retratos-chicos" data-cuantos={proximo.integrantes.length}>
+          <div className="flex flex-wrap items-end justify-center gap-4 sm:gap-6">
             {proximo.integrantes.map((integrante) => (
-              <Retrato key={integrante.id} integrante={integrante} />
+              <Retrato key={integrante.id} integrante={integrante} tamano="medio" />
             ))}
           </div>
 
-          <h1 className="proximo-titulo">
-            <span className="proximo-etiqueta">El próximo cumpleaños es de</span>
-            <span className="proximo-nombre">
+          <h1 className="m-0 flex flex-col gap-1.5">
+            <span className="text-base font-normal text-muted-foreground sm:text-lg">
+              El próximo cumpleaños es de
+            </span>
+            <span className="text-3xl font-bold tracking-tight text-balance sm:text-5xl">
               {unirNombres(proximo.integrantes.map((i) => i.nombre))}
             </span>
           </h1>
@@ -103,13 +114,13 @@ function DiaTranquilo({
           {esHoy ? (
             <CuentaRegresiva hasta={proximo.fecha} />
           ) : (
-            <p className="cuenta-estatica">
+            <p className="m-0 text-muted-foreground sm:text-lg">
               {enCuantosDias(proximo.dias)}, el {fechaCorta(proximo.fecha)}
             </p>
           )}
         </>
       ) : (
-        <p className="nota-vacia">Nadie tiene el cumpleaños cargado todavía.</p>
+        <p className="m-0 text-muted-foreground">Nadie tiene el cumpleaños cargado todavía.</p>
       )}
     </main>
   );
@@ -117,13 +128,15 @@ function DiaTranquilo({
 
 function SinNadieCargado() {
   return (
-    <main className="pantalla pantalla-tranquila">
-      <h1 className="proximo-titulo">
-        <span className="proximo-nombre">Todavía no hay nadie</span>
-      </h1>
-      <p className="nota-vacia">
-        Cargá al primer integrante y su cumpleaños va a aparecer acá.
-      </p>
+    <main className={PANTALLA}>
+      <Empty>
+        <EmptyHeader>
+          <EmptyTitle>Todavía no hay nadie</EmptyTitle>
+          <EmptyDescription>
+            Cargá al primer integrante y su cumpleaños va a aparecer acá.
+          </EmptyDescription>
+        </EmptyHeader>
+      </Empty>
     </main>
   );
 }

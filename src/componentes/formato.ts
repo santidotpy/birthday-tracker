@@ -40,3 +40,15 @@ export function unirNombres(nombres: string[]): string {
   if (nombres.length <= 1) return nombres[0] ?? '';
   return `${nombres.slice(0, -1).join(', ')} y ${nombres[nombres.length - 1]}`;
 }
+
+const MESES = [
+  'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+  'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre',
+] as const;
+
+export const nombresDeMes = MESES;
+
+/** "31 de agosto". Una Fecha de cumpleaños no tiene año, así que no se muestra. */
+export function diaMesLargo(md: { mes: number; dia: number }): string {
+  return `${md.dia} de ${MESES[md.mes - 1] ?? '?'}`;
+}
