@@ -8,6 +8,7 @@ import {
   msHastaInicioDe,
   msHastaProximaMedianoche,
   ocurrenciaEn,
+  parsearFechaISO,
   proximaOcurrenciaEstricta,
   proximaOcurrenciaInclusiva,
 } from './fechas.js';
@@ -167,5 +168,29 @@ describe('cuentas regresivas', () => {
   it('cruza el fin de año al buscar la próxima medianoche', () => {
     const ahora = new Date('2027-01-01T02:00:00Z'); // 31/12 23:00 en Argentina
     expect(msHastaProximaMedianoche(ahora)).toBe(60 * 60 * 1000);
+  });
+});
+
+describe('parsearFechaISO', () => {
+  it('acepta una fecha real', () => {
+    expect(parsearFechaISO('2026-09-06')).toEqual({ anio: 2026, mes: 9, dia: 6 });
+  });
+
+  it('rechaza el 29/02 de un año no bisiesto y acepta el de uno bisiesto', () => {
+    expect(parsearFechaISO('2027-02-29')).toBeNull();
+    expect(parsearFechaISO('2028-02-29')).toEqual({ anio: 2028, mes: 2, dia: 29 });
+  });
+
+  it('rechaza días y meses que no existen', () => {
+    expect(parsearFechaISO('2026-13-01')).toBeNull();
+    expect(parsearFechaISO('2026-00-10')).toBeNull();
+    expect(parsearFechaISO('2026-04-31')).toBeNull();
+    expect(parsearFechaISO('2026-09-00')).toBeNull();
+  });
+
+  it('rechaza cualquier cosa que no tenga el formato', () => {
+    for (const basura of ['', 'hoy', '2026-9-6', '2026/09/06', '20260906', '../etc/passwd']) {
+      expect(parsearFechaISO(basura), basura).toBeNull();
+    }
   });
 });

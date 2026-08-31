@@ -1,7 +1,11 @@
 node_modules
 dist
+.output
 .env
 .env.local
+
+# Volumen persistente: base y Retratos. Nunca al repo.
+datos/
 
 # La base y sus archivos auxiliares de WAL.
 *.sqlite

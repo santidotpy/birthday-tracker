@@ -166,3 +166,16 @@ function ocurrenciaSiguienteDia(f: FechaSimple): FechaSimple {
   if (f.mes < 12) return { anio: f.anio, mes: f.mes + 1, dia: 1 };
   return { anio: f.anio + 1, mes: 1, dia: 1 };
 }
+
+/**
+ * Parsea un `YYYY-MM-DD` de la URL. Devuelve `null` si no es un día real:
+ * rechaza el 2027-02-29 y acepta el 2028-02-29.
+ */
+export function parsearFechaISO(texto: string): FechaSimple | null {
+  const partes = /^(\d{4})-(\d{2})-(\d{2})$/.exec(texto);
+  if (!partes) return null;
+  const [anio, mes, dia] = [Number(partes[1]), Number(partes[2]), Number(partes[3])];
+  if (mes < 1 || mes > 12) return null;
+  if (dia < 1 || dia > diasDelMes(anio, mes)) return null;
+  return { anio, mes, dia };
+}
