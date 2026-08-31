@@ -6,6 +6,7 @@
  * cumpleaños no (siempre mira hacia adelante, aunque hoy haya cumple).
  */
 
+import type { Area } from './areas.js';
 import {
   type FechaSimple,
   type MesDia,
@@ -25,6 +26,8 @@ export interface Integrante {
   readonly retrato?: string | null;
   /** Decorativo. No entra en el cálculo de fechas. Ver ADR 0003. */
   readonly pais?: string | null;
+  /** Área de la empresa, de la lista cerrada de `areas.ts`. */
+  readonly area?: Area | null;
   readonly archivado?: boolean;
 }
 
@@ -102,4 +105,33 @@ export function proximoCumpleanos(
   desde: FechaSimple,
 ): EntradaDeAgenda | null {
   return agrupar(integrantes, desde, proximaOcurrenciaEstricta)[0] ?? null;
+}
+
+/** Un mes de la Agenda con los cumpleaños que caen en él. */
+export interface MesDeAgenda {
+  readonly anio: number;
+  readonly mes: number;
+  readonly entradas: readonly EntradaDeAgenda[];
+}
+
+/**
+ * Agrupa la Agenda por mes, conservando su orden.
+ *
+ * Agrupa por año y mes, no solo por mes: como la Agenda da la vuelta al año,
+ * un mismo mes puede aparecer dos veces —una al principio con los que faltan
+ * y otra al final con los que ya pasaron— y colapsarlos rompería el orden.
+ */
+export function agendaPorMes(entradas: readonly EntradaDeAgenda[]): MesDeAgenda[] {
+  const meses: MesDeAgenda[] = [];
+
+  for (const entrada of entradas) {
+    const ultimo = meses[meses.length - 1];
+    if (ultimo && ultimo.anio === entrada.fecha.anio && ultimo.mes === entrada.fecha.mes) {
+      (ultimo.entradas as EntradaDeAgenda[]).push(entrada);
+    } else {
+      meses.push({ anio: entrada.fecha.anio, mes: entrada.fecha.mes, entradas: [entrada] });
+    }
+  }
+
+  return meses;
 }

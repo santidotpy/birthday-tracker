@@ -7,6 +7,7 @@
 
 import { eq, isNull } from 'drizzle-orm';
 import type { Integrante } from '../domain/agenda.js';
+import { type Area, areaONada, esAreaValida } from '../domain/areas.js';
 import { esMesDiaValido, type MesDia } from '../domain/fechas.js';
 import type { Db } from './index.js';
 import { integrantes, type FilaIntegrante } from './schema.js';
@@ -17,6 +18,7 @@ export interface DatosDeIntegrante {
   retrato?: string | null;
   retratoOrigen?: string | null;
   pais?: string | null;
+  area?: Area | null;
 }
 
 export function aIntegrante(fila: FilaIntegrante): Integrante {
@@ -26,6 +28,8 @@ export function aIntegrante(fila: FilaIntegrante): Integrante {
     fechaDeCumpleanos: { mes: fila.mesCumple, dia: fila.diaCumple },
     retrato: fila.retrato,
     pais: fila.pais,
+    // Un Área que salió de la lista se degrada a null en vez de propagarse.
+    area: areaONada(fila.area),
     archivado: fila.archivadoEn !== null,
   };
 }
@@ -33,6 +37,7 @@ export function aIntegrante(fila: FilaIntegrante): Integrante {
 export function validarDatos(datos: {
   nombre: string;
   fechaDeCumpleanos: MesDia;
+  area?: string | null;
 }): void {
   if (datos.nombre.trim() === '') {
     throw new Error('El nombre no puede estar vacío');
@@ -40,6 +45,9 @@ export function validarDatos(datos: {
   if (!esMesDiaValido(datos.fechaDeCumpleanos)) {
     const { mes, dia } = datos.fechaDeCumpleanos;
     throw new Error(`Fecha de cumpleaños inválida: ${dia}/${mes}`);
+  }
+  if (datos.area != null && !esAreaValida(datos.area)) {
+    throw new Error(`Área desconocida: ${datos.area}`);
   }
 }
 
@@ -69,6 +77,7 @@ export function crearIntegrante(db: Db, datos: DatosDeIntegrante): Integrante {
       retrato: datos.retrato ?? null,
       retratoOrigen: datos.retratoOrigen ?? null,
       pais: datos.pais ?? null,
+      area: datos.area ?? null,
     })
     .returning()
     .get();
@@ -86,6 +95,7 @@ export function editarIntegrante(db: Db, id: string, datos: DatosDeIntegrante): 
       retrato: datos.retrato ?? null,
       retratoOrigen: datos.retratoOrigen ?? null,
       pais: datos.pais ?? null,
+      area: datos.area ?? null,
       actualizadoEn: new Date(),
     })
     .where(eq(integrantes.id, id))

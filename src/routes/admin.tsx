@@ -1,4 +1,5 @@
 import { Alert, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -25,8 +26,26 @@ import { useState } from 'react';
 import { Retrato } from '../componentes/Retrato.js';
 import { diaMesLargo, nombresDeMes } from '../componentes/formato.js';
 import type { Integrante } from '../domain/agenda.js';
+import { AREAS, areaONada } from '../domain/areas.js';
 import { cambiarArchivado, crear, editar, listarParaAdmin } from '../servidor/admin.js';
 import { cerrarSesion, sesionActual } from '../servidor/sesion.js';
+
+/** El Select necesita un string; este representa "sin Área". */
+const SIN_AREA = '__ninguna';
+
+/*
+ * Base UI muestra el valor crudo salvo que Root reciba el mapa de etiquetas.
+ * Sin esto el trigger decía "1" en vez de "enero" y "__ninguna" en vez de
+ * "Sin área".
+ */
+const ETIQUETAS_DE_MES = Object.fromEntries(
+  nombresDeMes.map((nombre, indice) => [String(indice + 1), nombre]),
+);
+
+const ETIQUETAS_DE_AREA = {
+  [SIN_AREA]: 'Sin área',
+  ...Object.fromEntries(AREAS.map((area) => [area, area])),
+};
 
 export const Route = createFileRoute('/admin')({
   beforeLoad: async () => {
@@ -120,6 +139,7 @@ function Formulario({
   // de un FormData nativo como lo harían un <select> y un <input> comunes.
   const [mes, setMes] = useState(String(integrante?.fechaDeCumpleanos.mes ?? 1));
   const [quitarRetrato, setQuitarRetrato] = useState(false);
+  const [area, setArea] = useState(integrante?.area ?? SIN_AREA);
 
   async function enviar(evento: React.FormEvent<HTMLFormElement>) {
     evento.preventDefault();
@@ -130,6 +150,7 @@ function Formulario({
       nombre: String(campos.get('nombre') ?? ''),
       fechaDeCumpleanos: { mes: Number(mes), dia: Number(campos.get('dia')) },
       pais: String(campos.get('pais') ?? '').trim() || null,
+      area: area === SIN_AREA ? null : areaONada(area),
       // Tres estados: quitar la foto, reemplazarla, o dejarla como está.
       urlDeRetrato: quitarRetrato ? null : url !== '' ? url : undefined,
     };
@@ -183,9 +204,13 @@ function Formulario({
                 />
               </Field>
 
-              <Field className="min-w-40 flex-1">
+              <Field className="w-44 shrink-0">
                 <FieldLabel htmlFor="mes">Mes</FieldLabel>
-                <Select value={mes} onValueChange={(valor) => setMes(valor ?? '1')}>
+                <Select
+                  items={ETIQUETAS_DE_MES}
+                  value={mes}
+                  onValueChange={(valor) => setMes(valor ?? '1')}
+                >
                   <SelectTrigger id="mes">
                     <SelectValue />
                   </SelectTrigger>
@@ -193,6 +218,32 @@ function Formulario({
                     <SelectGroup>
                       {nombresDeMes.map((nombre, indice) => (
                         <SelectItem key={nombre} value={String(indice + 1)}>
+                          {nombre}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </Field>
+
+            </div>
+
+            <div className="flex flex-wrap gap-4">
+              <Field className="w-56 shrink-0">
+                <FieldLabel htmlFor="area">Área</FieldLabel>
+                <Select
+                  items={ETIQUETAS_DE_AREA}
+                  value={area}
+                  onValueChange={(valor) => setArea(valor ?? SIN_AREA)}
+                >
+                  <SelectTrigger id="area">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value={SIN_AREA}>Sin área</SelectItem>
+                      {AREAS.map((nombre) => (
+                        <SelectItem key={nombre} value={nombre}>
                           {nombre}
                         </SelectItem>
                       ))}
@@ -297,8 +348,11 @@ function ListaDeIntegrantes({
                 >
                   <Retrato integrante={integrante} tamano="fila" />
 
-                  <div className="flex min-w-0 flex-1 flex-col">
-                    <span className="truncate font-semibold">{integrante.nombre}</span>
+                  <div className="flex min-w-0 flex-1 flex-col gap-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="truncate font-semibold">{integrante.nombre}</span>
+                      {integrante.area && <Badge variant="secondary">{integrante.area}</Badge>}
+                    </div>
                     <span className="text-sm text-muted-foreground">
                       {diaMesLargo(integrante.fechaDeCumpleanos)}
                       {integrante.pais ? ` · ${integrante.pais}` : ''}

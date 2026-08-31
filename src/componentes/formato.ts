@@ -52,3 +52,12 @@ export const nombresDeMes = MESES;
 export function diaMesLargo(md: { mes: number; dia: number }): string {
   return `${md.dia} de ${MESES[md.mes - 1] ?? '?'}`;
 }
+
+/**
+ * Encabezado de mes para la Agenda. Suma el año cuando la Agenda ya dio la
+ * vuelta, para que dos "agosto" seguidos no se confundan.
+ */
+export function mesDeAgenda(anio: number, mes: number, anioBase: number): string {
+  const nombre = MESES[mes - 1] ?? '?';
+  return anio === anioBase ? nombre : `${nombre} ${anio}`;
+}

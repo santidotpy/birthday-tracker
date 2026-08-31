@@ -40,6 +40,10 @@ _Avoid_: siguiente cumpleaños, el que viene
 La lista de todos los Integrantes ordenada desde la fecha que se está viendo hacia adelante, dando la vuelta al año. A diferencia del Próximo cumpleaños, sí incluye esa fecha: quien cumple hoy encabeza la Agenda. No empieza en enero.
 _Avoid_: calendario, listado, índice
 
+**Área**:
+La parte de la empresa a la que pertenece un Integrante. Sale de una lista cerrada; un Integrante puede no tener ninguna.
+_Avoid_: sector, departamento, equipo, unidad
+
 **Retrato**:
 La imagen que representa a un Integrante. Es una copia que guarda la app, no una referencia a una imagen alojada en otro lado.
 _Avoid_: foto, avatar, imagen de perfil

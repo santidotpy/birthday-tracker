@@ -1,0 +1,1 @@
+ALTER TABLE `integrantes` ADD `area` text;

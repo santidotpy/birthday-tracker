@@ -1,3 +1,4 @@
+import { eq } from 'drizzle-orm';
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { agenda, proximoCumpleanos } from '../domain/agenda.js';
@@ -61,6 +62,41 @@ describe('crearIntegrante', () => {
     expect(ana.pais).toBe('AR');
     // La procedencia no viaja al dominio: nada del render la usa (ADR 0001).
     expect('retratoOrigen' in ana).toBe(false);
+  });
+});
+
+describe('el Área', () => {
+  it('se guarda y vuelve como parte del dominio', () => {
+    const ana = crearIntegrante(db, {
+      nombre: 'Ana',
+      fechaDeCumpleanos: { mes: 8, dia: 31 },
+      area: 'IT',
+    });
+    expect(ana.area).toBe('IT');
+    expect(buscarIntegrante(db, ana.id)?.area).toBe('IT');
+  });
+
+  it('es opcional', () => {
+    expect(crearIntegrante(db, { nombre: 'Ana', fechaDeCumpleanos: { mes: 8, dia: 31 } }).area)
+      .toBeNull();
+  });
+
+  it('rechaza un área que no está en la lista', () => {
+    expect(() =>
+      crearIntegrante(db, {
+        nombre: 'Ana',
+        fechaDeCumpleanos: { mes: 8, dia: 31 },
+        // @ts-expect-error: justamente lo que el tipo impide y la base no.
+        area: 'Sistemas',
+      }),
+    ).toThrow(/área desconocida/i);
+  });
+
+  it('degrada a null un área que salió de la lista después de guardarse', () => {
+    const ana = crearIntegrante(db, { nombre: 'Ana', fechaDeCumpleanos: { mes: 8, dia: 31 } });
+    // Simula que el Área existía cuando se guardó y después se quitó de areas.ts.
+    db.update(integrantes).set({ area: 'Área Vieja' }).where(eq(integrantes.id, ana.id)).run();
+    expect(buscarIntegrante(db, ana.id)?.area).toBeNull();
   });
 });
 

@@ -9,6 +9,7 @@
 import { borrarRetrato } from '../retratos/almacen.js';
 import { ingerirRetrato } from '../retratos/ingesta.js';
 import type { Integrante } from '../domain/agenda.js';
+import type { Area } from '../domain/areas.js';
 import type { MesDia } from '../domain/fechas.js';
 import type { Db } from '../db/index.js';
 import {
@@ -27,6 +28,7 @@ export interface DatosDeAlta {
   /** URL de donde traer el Retrato. La app se queda con una copia (ADR 0001). */
   urlDeRetrato?: string | null;
   pais?: string | null;
+  area?: Area | null;
 }
 
 interface OpcionesDeServicio {
@@ -54,6 +56,7 @@ export async function altaDeIntegrante(
       retrato: retrato?.archivo ?? null,
       retratoOrigen: retrato?.origen ?? null,
       pais: datos.pais ?? null,
+      area: datos.area ?? null,
     });
   } catch (error) {
     // El alta no quedó: el archivo que acabamos de bajar no le sirve a nadie.
@@ -97,6 +100,7 @@ export async function edicionDeIntegrante(
       retrato: cambiaElRetrato ? (nuevo?.archivo ?? null) : (anterior?.retrato ?? null),
       retratoOrigen: cambiaElRetrato ? (nuevo?.origen ?? null) : (anterior?.origen ?? null),
       pais: datos.pais ?? null,
+      area: datos.area ?? null,
     });
 
     // Recién ahora, con la base ya actualizada, el archivo viejo sobra.

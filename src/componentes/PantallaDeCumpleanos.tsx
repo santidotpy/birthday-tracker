@@ -1,6 +1,8 @@
+import { Badge } from '@/components/ui/badge';
 import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from '@/components/ui/empty';
 import { type Integrante, cumpleanerosEn, proximoCumpleanos } from '../domain/agenda.js';
 import type { FechaSimple } from '../domain/fechas.js';
+import { Agenda } from './Agenda.js';
 import { Confetti } from './Confetti.js';
 import { CuentaRegresiva } from './CuentaRegresiva.js';
 import { Retrato } from './Retrato.js';
@@ -22,10 +24,12 @@ export function PantallaDeCumpleanos({ integrantes, fecha, esHoy }: Props) {
   const cumpleaneros = cumpleanerosEn(integrantes, fecha);
   const proximo = proximoCumpleanos(integrantes, fecha);
 
+  const agenda = <Agenda integrantes={integrantes} desde={fecha} />;
+
   return cumpleaneros.length > 0 ? (
-    <Celebracion cumpleaneros={cumpleaneros} fecha={fecha} proximo={proximo} />
+    <Celebracion cumpleaneros={cumpleaneros} fecha={fecha} proximo={proximo} agenda={agenda} />
   ) : (
-    <DiaTranquilo fecha={fecha} esHoy={esHoy} proximo={proximo} />
+    <DiaTranquilo fecha={fecha} esHoy={esHoy} proximo={proximo} agenda={agenda} />
   );
 }
 
@@ -35,10 +39,12 @@ function Celebracion({
   cumpleaneros,
   fecha,
   proximo,
+  agenda,
 }: {
   cumpleaneros: Integrante[];
   fecha: FechaSimple;
   proximo: Proximo;
+  agenda: React.ReactNode;
 }) {
   const varios = cumpleaneros.length > 1;
 
@@ -50,7 +56,12 @@ function Celebracion({
         {cumpleaneros.map((integrante) => (
           <figure key={integrante.id} className="m-0 flex flex-col items-center gap-3">
             <Retrato integrante={integrante} conGorrito tamano={varios ? 'medio' : 'hero'} />
-            {varios && <figcaption className="text-lg font-semibold">{integrante.nombre}</figcaption>}
+            {varios && (
+              <figcaption className="flex flex-col items-center gap-1.5">
+                <span className="text-lg font-semibold">{integrante.nombre}</span>
+                {integrante.area && <Badge variant="secondary">{integrante.area}</Badge>}
+              </figcaption>
+            )}
           </figure>
         ))}
       </div>
@@ -59,6 +70,13 @@ function Celebracion({
         ¡Feliz cumpleaños,{' '}
         <span className="text-primary">{unirNombres(cumpleaneros.map((i) => i.nombre))}!</span>
       </h1>
+
+      {/* Con una sola persona el área va suelta; con varias va bajo cada retrato. */}
+      {!varios && cumpleaneros[0]?.area && (
+        <Badge variant="secondary" className="px-3 py-1 text-sm sm:text-base">
+          {cumpleaneros[0].area}
+        </Badge>
+      )}
 
       {proximo && (
         <p className="m-0 max-w-[34ch] leading-relaxed text-balance text-muted-foreground">
@@ -69,6 +87,8 @@ function Celebracion({
           , {enCuantosDias(proximo.dias)}.
         </p>
       )}
+
+      {agenda}
     </main>
   );
 }
@@ -77,10 +97,12 @@ function DiaTranquilo({
   fecha,
   esHoy,
   proximo,
+  agenda,
 }: {
   fecha: FechaSimple;
   esHoy: boolean;
   proximo: Proximo;
+  agenda: React.ReactNode;
 }) {
   return (
     <main className={PANTALLA}>
@@ -107,6 +129,19 @@ function DiaTranquilo({
             </span>
           </h1>
 
+          {proximo.integrantes.some((i) => i.area) && (
+            <div className="flex flex-wrap justify-center gap-2">
+              {proximo.integrantes.map(
+                (integrante) =>
+                  integrante.area && (
+                    <Badge key={integrante.id} variant="secondary">
+                      {integrante.area}
+                    </Badge>
+                  ),
+              )}
+            </div>
+          )}
+
           {/*
             La cuenta regresiva al segundo solo tiene sentido desde ahora.
             Parada en una fecha cualquiera, un contador tickeando es ruido.
@@ -122,6 +157,8 @@ function DiaTranquilo({
       ) : (
         <p className="m-0 text-muted-foreground">Nadie tiene el cumpleaños cargado todavía.</p>
       )}
+
+      {agenda}
     </main>
   );
 }

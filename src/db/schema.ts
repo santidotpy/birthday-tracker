@@ -28,6 +28,12 @@ export const integrantes = sqliteTable(
     pais: text('pais'),
 
     /**
+     * Área de la empresa. Sin CHECK a propósito: la lista vive en
+     * `src/domain/areas.ts` y un CHECK obligaría a migrar cada vez que cambia.
+     */
+    area: text('area'),
+
+    /**
      * Un Integrante Archivado conserva sus datos y desaparece de las vistas.
      * Timestamp en vez de booleano: la pregunta binaria sigue siendo trivial
      * (`archivadoEn !== null`) y además queda registrado cuándo fue.

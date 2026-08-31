@@ -8,6 +8,7 @@
 
 import { createServerFn } from '@tanstack/react-start';
 import type { Integrante } from '../domain/agenda.js';
+import type { Area } from '../domain/areas.js';
 import type { MesDia } from '../domain/fechas.js';
 
 async function exigirAdministrador() {
@@ -24,6 +25,7 @@ export interface DatosDelFormulario {
   /** `undefined` deja el Retrato como está, una URL lo reemplaza, `null` lo quita. */
   urlDeRetrato?: string | null;
   pais?: string | null;
+  area?: Area | null;
 }
 
 /** Incluye a los Archivados: el panel es el único lugar donde se los ve. */

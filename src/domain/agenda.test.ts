@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { agenda, cumpleanerosEn, proximoCumpleanos, type Integrante } from './agenda.js';
+import {
+  agenda,
+  agendaPorMes,
+  cumpleanerosEn,
+  proximoCumpleanos,
+  type Integrante,
+} from './agenda.js';
 
 function integrante(nombre: string, mes: number, dia: number, archivado = false): Integrante {
   return { id: nombre.toLowerCase(), nombre, fechaDeCumpleanos: { mes, dia }, archivado };
@@ -118,5 +124,39 @@ describe('proximoCumpleanos', () => {
   it('devuelve null sin integrantes activos', () => {
     expect(proximoCumpleanos([], hoy)).toBeNull();
     expect(proximoCumpleanos([integrante('Exempleado', 9, 6, true)], hoy)).toBeNull();
+  });
+});
+
+describe('agendaPorMes', () => {
+  const hoy = { anio: 2026, mes: 8, dia: 15 };
+
+  it('agrupa conservando el orden de la agenda', () => {
+    const equipo = [
+      integrante('Setiembre', 9, 10),
+      integrante('Octubre', 10, 2),
+      integrante('Otro Setiembre', 9, 25),
+    ];
+    const meses = agendaPorMes(agenda(equipo, hoy));
+    expect(meses.map((m) => m.mes)).toEqual([9, 10]);
+    expect(meses[0]!.entradas).toHaveLength(2);
+  });
+
+  it('deja el mismo mes dos veces cuando la agenda da la vuelta al año', () => {
+    // Estamos a mitad de agosto: uno cumple en unos días, el otro ya pasó y
+    // recién vuelve el año que viene. Los dos son "agosto" y no se colapsan.
+    const equipo = [integrante('Pronto', 8, 20), integrante('Ya pasó', 8, 5)];
+    const meses = agendaPorMes(agenda(equipo, hoy));
+
+    expect(meses).toHaveLength(2);
+    expect(meses.map((m) => [m.anio, m.mes])).toEqual([
+      [2026, 8],
+      [2027, 8],
+    ]);
+    expect(meses[0]!.entradas[0]!.integrantes[0]!.nombre).toBe('Pronto');
+    expect(meses[1]!.entradas[0]!.integrantes[0]!.nombre).toBe('Ya pasó');
+  });
+
+  it('con la agenda vacía devuelve vacío', () => {
+    expect(agendaPorMes([])).toEqual([]);
   });
 });
