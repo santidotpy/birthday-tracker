@@ -1,7 +1,11 @@
 node_modules
 dist
 .env
+.env.local
+
+# La base y sus archivos auxiliares de WAL.
 *.sqlite
-*.sqlite-journal
+*.sqlite-*
+
 .agents/
 .claude/
