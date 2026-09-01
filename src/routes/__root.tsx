@@ -26,7 +26,7 @@ export const Route = createRootRoute({
   notFoundComponent: () => (
     <Documento>
       <main className="aparece flex min-h-dvh flex-col items-center justify-center gap-4 p-6 text-center">
-        <h1 className="m-0 text-3xl font-bold tracking-tight sm:text-5xl">Esa fecha no existe</h1>
+        <h1 className="m-0 text-3xl font-bold tracking-tight sm:text-5xl sm:tracking-[-0.03em]">Esa fecha no existe</h1>
         <a className="text-muted-foreground underline underline-offset-4" href="/">
           Volver a hoy
         </a>

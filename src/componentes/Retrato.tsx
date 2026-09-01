@@ -6,10 +6,15 @@ import { iniciales, variablesDeRespaldo } from '../retratos/iniciales.js';
 /**
  * El mismo Retrato se usa enorme en la pantalla de Hoy y diminuto en una fila
  * del panel, así que el tamaño es explícito por uso.
+ *
+ * Los techos son altos a propósito. El destino de esta pantalla es un televisor
+ * de la oficina, que se mira de lejos: con un tope bajo el Retrato quedaba del
+ * mismo tamaño en un celular que en una pantalla de 2500px, flotando en un
+ * vacío enorme. El `clamp` sigue cuidando el celular por abajo.
  */
 const TAMANOS = {
-  hero: 'w-[clamp(9rem,26vw,17rem)]',
-  medio: 'w-[clamp(5rem,12vw,7.5rem)]',
+  hero: 'w-[clamp(9rem,24vw,26rem)]',
+  medio: 'w-[clamp(5rem,13vw,13rem)]',
   fila: 'w-11',
 } as const;
 

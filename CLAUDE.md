@@ -66,7 +66,21 @@ Cookie → servidor → `light-dark()`. `src/servidor/tema.ts` resuelve el tema 
 
 Si tocás el tema, las dos piezas tienen que seguir de acuerdo: los tokens `light-dark()` y el `@custom-variant dark`, que es lo que hace andar las clases `dark:` que traen los componentes de shadcn.
 
+El cambio de tema pasa por `document.startViewTransition` con un `flushSync` adentro, para que el fondo no salte de golpe y para que el botón marcado del selector cambie en el mismo cuadro. Ese crossfade **no** va adentro de `prefers-reduced-motion`: es opacidad pura y suavizar el salto de brillo le importa más a quien pidió menos movimiento.
+
 La paleta de iniciales (`src/retratos/iniciales.ts`) son **pares**, uno por tema, porque los colores que llevan texto blanco son todos oscuros y en tema oscuro el círculo del Retrato desaparecía contra el fondo. Los tests verifican contraste contra la tinta *y* contra el fondo de cada tema; si agregás un color, ellos deciden si entra.
+
+### Motion
+
+Una sola curva, `--sale`, para todo. La entrada de las pantallas es en cascada: `.entra` con `--retraso` por elemento, setenta milisegundos entre uno y otro, y el confeti espera a que el Retrato haya llegado para que se lea como un evento y no como dos.
+
+Movimiento reducido conserva la cascada pero se queda solo con el fundido; el crossfade del tema tampoco se apaga, porque es opacidad pura.
+
+Los dígitos de la cuenta regresiva **no** se animan, a propósito: cambian una vez por segundo y animarlos los haría ilegibles.
+
+### Tamaños: el destino es un televisor
+
+Los techos de `clamp()` en `Retrato.tsx` y los pasos `2xl:` de tipografía existen porque esta pantalla vive en una TV de 2500px que se mira de lejos. Con los topes bajos de antes, todo quedaba del mismo tamaño en un celular que en la TV, flotando en un vacío enorme. Si tocás tamaños, miralo a 2500px de ancho, no solo en la laptop.
 
 ### Frescura
 

@@ -62,6 +62,7 @@ No hay logo ni assets de marca. LinkedIn no puede proveer los retratos: su API n
 
 ## Accessibility & Inclusion
 
-- Se respeta `prefers-reduced-motion`: se cancela el confeti y se saca todo lo que se desplaza, conservando el fundido.
+- Se respeta `prefers-reduced-motion`: se cancela el confeti y se saca todo lo que se desplaza, conservando el fundido. El crossfade al cambiar de tema queda igual: es opacidad pura y suavizar el salto de brillo importa más, no menos.
+- Se respetan `prefers-reduced-transparency` (las superficies translúcidas se vuelven opacas, con borde en lugar de blur) y `prefers-contrast: more` (tinta apagada y bordes más marcados).
 - La paleta de iniciales son pares, uno por tema, verificados con tests: 4.5:1 o más contra su tinta, y 3:1 o más contra el fondo de su tema, para que el círculo del Retrato no se pierda contra el fondo.
 - No se estableció ningún otro estándar específico del producto.

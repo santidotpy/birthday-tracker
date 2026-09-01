@@ -130,6 +130,61 @@
   }
 }
 
+/* --- Accesibilidad de la superficie --------------------------------------- */
+
+/*
+ * Translucidez reducida: hay quien no puede leer sobre una superficie que deja
+ * pasar lo de atrás. Las dos superficies translúcidas de la app —el velo del
+ * diálogo y los encabezados de mes, que quedan pegados arriba al scrollear—
+ * se vuelven opacas. Sin blur no hay separación, así que la da un borde.
+ */
+@media (prefers-reduced-transparency: reduce) {
+  [data-slot='dialog-overlay'],
+  .encabezado-de-mes {
+    backdrop-filter: none;
+  }
+
+  .encabezado-de-mes {
+    background-color: var(--background);
+    border-bottom: 1px solid var(--border);
+  }
+}
+
+/*
+ * Contraste alto: nada de fondos a medias ni bordes que se insinúan. La tinta
+ * apagada se acerca a la principal, que si no es lo primero que se pierde.
+ */
+@media (prefers-contrast: more) {
+  :root {
+    --muted-foreground: light-dark(#4a423c, #cdc4bc);
+    --border: light-dark(#b9aea4, #5c534c);
+    --input: light-dark(#b9aea4, #5c534c);
+  }
+
+  .encabezado-de-mes {
+    background-color: var(--background);
+    backdrop-filter: none;
+    border-bottom: 1px solid var(--border);
+  }
+}
+
+/* --- Cambio de tema ------------------------------------------------------- */
+
+/*
+ * El crossfade de todo el documento al cambiar de tema. Un `transition` sobre
+ * los colores no serviría: cada elemento interpolaría por su cuenta y se
+ * verían dos estados superpuestos. Esto cruza una sola imagen.
+ *
+ * No va adentro de un `prefers-reduced-motion` a propósito: es opacidad pura,
+ * sin nada que se desplace, y suavizar el salto de brillo importa más para
+ * quien pidió menos movimiento, no menos.
+ */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 200ms;
+  animation-timing-function: var(--sale);
+}
+
 /* --- Lo que no se expresa como utilidad ---------------------------------- */
 
 /* Nada aparece de la nada: se entra desde 0.97, nunca desde 0. */
@@ -142,6 +197,21 @@
 
 .aparece {
   animation: aparecer 260ms var(--sale) both;
+}
+
+/*
+ * Lo mismo, pero en cascada: cada pieza entra un toque después de la anterior
+ * en vez de aparecer todo junto de golpe. El retraso lo pone cada elemento en
+ * `--retraso`.
+ *
+ * El escalonado es lo que convierte una pantalla que se prende en una que
+ * llega: primero la persona, después su nombre, después el resto. Los pasos
+ * son cortos a propósito —setenta milisegundos— porque un escalonado largo se
+ * siente lento en vez de coreografiado, y esto se ve todos los días.
+ */
+.entra {
+  animation: aparecer 400ms var(--sale) both;
+  animation-delay: var(--retraso, 0ms);
 }
 
 /*
@@ -184,6 +254,15 @@
 @media (prefers-reduced-motion: reduce) {
   .aparece {
     animation: fundir 200ms ease both;
+  }
+
+  /*
+   * La cascada se conserva —ayuda a leer en qué orden mirar— pero sin escala:
+   * queda solo el fundido, que es lo que el movimiento reducido permite.
+   */
+  .entra {
+    animation: fundir 200ms ease both;
+    animation-delay: var(--retraso, 0ms);
   }
 
   @keyframes fundir {

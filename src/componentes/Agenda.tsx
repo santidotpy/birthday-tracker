@@ -113,7 +113,7 @@ export function Agenda({ integrantes, desde }: Props) {
                   a mitad de camino, saber en qué mes estás parado es la única
                   referencia que queda.
                 */}
-                <h3 className="sticky top-0 z-10 bg-background/95 px-5 py-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase backdrop-blur">
+                <h3 className="encabezado-de-mes sticky top-0 z-10 bg-background/95 px-5 py-2 text-xs font-semibold tracking-wide text-muted-foreground uppercase backdrop-blur">
                   {mesDeAgenda(mes.anio, mes.mes, desde.anio)}
                 </h3>
 
