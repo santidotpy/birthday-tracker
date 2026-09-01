@@ -14,6 +14,7 @@ import { useMemo, useState } from 'react';
 import { type Integrante, agenda, agendaPorMes } from '../domain/agenda.js';
 import type { FechaSimple } from '../domain/fechas.js';
 import { Retrato } from './Retrato.js';
+import { SelectorDeTema } from './SelectorDeTema.js';
 import { diaMesLargo, enCuantosDias, mesDeAgenda } from './formato.js';
 
 interface Props {
@@ -162,6 +163,17 @@ export function Agenda({ integrantes, desde }: Props) {
               </section>
             ))
           )}
+        </div>
+
+        {/*
+          El tema vive acá y no en la pantalla de Hoy a propósito: esa pantalla
+          contesta una sola pregunta de un vistazo y no tiene un solo control
+          más que este diálogo. Quien viene a cambiar el tema ya está mirando,
+          no de reojo.
+        */}
+        <div className="flex items-center justify-between gap-3 border-t p-3">
+          <span className="pl-2 text-sm text-muted-foreground">Tema</span>
+          <SelectorDeTema />
         </div>
       </DialogContent>
     </Dialog>

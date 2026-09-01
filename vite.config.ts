@@ -35,7 +35,8 @@ export default defineConfig({
   },
   plugins: [servirRetratos(), tailwindcss(), tanstackStart(), viteReact()],
   test: {
-    // Los tests son de Node: no cargan el entorno del navegador.
-    include: ['src/**/*.test.ts'],
+    // Los tests son de Node: no cargan el entorno del navegador. Los de
+    // componentes usan `renderToStaticMarkup`, que tampoco lo necesita.
+    include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
   },
 });

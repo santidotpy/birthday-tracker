@@ -6,76 +6,79 @@
  * componentes; acá queda solo lo que no se expresa bien como utilidad.
  */
 
+/* --- Tema ---------------------------------------------------------------- */
+
 /*
- * El modo oscuro sigue al sistema, no a una clase: no hay selector de tema
- * y la app va a vivir en una TV que nadie va a configurar.
+ * Tres estados, no dos: `sistema` (sin atributo) es el default y tiene que
+ * poder recuperarse. Seguir al sistema es lo correcto en un celular, que se
+ * pone oscuro de noche solo; el override manual existe por la TV de la
+ * oficina, donde `prefers-color-scheme` miente porque un kiosco reporta claro
+ * y esa pantalla va a estar prendida ocho horas contra una pared.
+ *
+ * Quién decide el tema: `color-scheme`. Todos los tokens de abajo son
+ * `light-dark()`, así que cambiar esa sola propiedad da vuelta la app entera
+ * —incluidas las barras de scroll y los controles nativos, que con una clase
+ * se quedarían en el tema del sistema y pelearían con la página—.
  */
-@custom-variant dark (@media (prefers-color-scheme: dark));
+:root {
+  color-scheme: light dark;
+}
+:root[data-tema='claro'] {
+  color-scheme: light;
+}
+:root[data-tema='oscuro'] {
+  color-scheme: dark;
+}
+
+/*
+ * Las clases `dark:` que traen los componentes de shadcn tienen que coincidir
+ * con lo que hace `light-dark()`, si no los tokens y las utilidades quedan en
+ * temas distintos.
+ */
+@custom-variant dark {
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-tema='claro']) *) {
+      @slot;
+    }
+  }
+  &:where(:root[data-tema='oscuro'] *) {
+    @slot;
+  }
+}
 
 :root {
   --radius: 0.65rem;
 
-  --background: #faf8f6;
-  --foreground: #1a1614;
+  --background: light-dark(#faf8f6, #14100e);
+  --foreground: light-dark(#1a1614, #f4efea);
 
-  --card: #fffdfb;
-  --card-foreground: #1a1614;
-  --popover: #fffdfb;
-  --popover-foreground: #1a1614;
+  --card: light-dark(#fffdfb, #1d1815);
+  --card-foreground: light-dark(#1a1614, #f4efea);
+  --popover: light-dark(#fffdfb, #1d1815);
+  --popover-foreground: light-dark(#1a1614, #f4efea);
 
-  --primary: #d81e5b;
-  --primary-foreground: #fffafc;
+  /* Sobre el fucsia claro del tema oscuro el texto va oscuro: en blanco no se leería. */
+  --primary: light-dark(#d81e5b, #ff6b96);
+  --primary-foreground: light-dark(#fffafc, #2b1119);
 
-  --secondary: #f1ebe5;
-  --secondary-foreground: #1a1614;
+  --secondary: light-dark(#f1ebe5, #2c2521);
+  --secondary-foreground: light-dark(#1a1614, #f4efea);
 
-  --muted: #f1ebe5;
-  --muted-foreground: #6f655e;
+  --muted: light-dark(#f1ebe5, #2c2521);
+  --muted-foreground: light-dark(#6f655e, #9b8f86);
 
-  --accent: #f1ebe5;
-  --accent-foreground: #1a1614;
+  --accent: light-dark(#f1ebe5, #2c2521);
+  --accent-foreground: light-dark(#1a1614, #f4efea);
 
-  --destructive: #c0392b;
-  --destructive-foreground: #fff;
+  --destructive: light-dark(#c0392b, #ff6b5e);
+  --destructive-foreground: light-dark(#ffffff, #2b1114);
 
-  --border: #e7e0d9;
-  --input: #e7e0d9;
-  --ring: #d81e5b;
+  --border: light-dark(#e7e0d9, #2c2521);
+  --input: light-dark(#e7e0d9, #2c2521);
+  --ring: light-dark(#d81e5b, #ff6b96);
 
   /* Las curvas nativas de CSS son flojas; esta tiene intención. */
   --sale: cubic-bezier(0.23, 1, 0.32, 1);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #14100e;
-    --foreground: #f4efea;
-
-    --card: #1d1815;
-    --card-foreground: #f4efea;
-    --popover: #1d1815;
-    --popover-foreground: #f4efea;
-
-    --primary: #ff6b96;
-    /* Sobre un fucsia claro el texto va oscuro: en blanco no se leería. */
-    --primary-foreground: #2b1119;
-
-    --secondary: #2c2521;
-    --secondary-foreground: #f4efea;
-
-    --muted: #2c2521;
-    --muted-foreground: #9b8f86;
-
-    --accent: #2c2521;
-    --accent-foreground: #f4efea;
-
-    --destructive: #ff6b5e;
-    --destructive-foreground: #2b1114;
-
-    --border: #2c2521;
-    --input: #2c2521;
-    --ring: #ff6b96;
-  }
 }
 
 @theme inline {
@@ -112,16 +115,18 @@
     border-color: var(--border);
   }
 
-  html {
-    color-scheme: light dark;
-  }
-
   body {
     margin: 0;
     background-color: var(--background);
     color: var(--foreground);
     font-family: ui-rounded, 'SF Pro Rounded', system-ui, -apple-system, 'Segoe UI', sans-serif;
     -webkit-font-smoothing: antialiased;
+  }
+
+  /* La selección también es parte del tema; el celeste del navegador no. */
+  ::selection {
+    background-color: color-mix(in srgb, var(--primary) 24%, transparent);
+    color: var(--foreground);
   }
 }
 
@@ -137,6 +142,24 @@
 
 .aparece {
   animation: aparecer 260ms var(--sale) both;
+}
+
+/*
+ * El respaldo del Retrato: fondo por persona, tinta por tema.
+ *
+ * Los dos colores del par los pone `Retrato.tsx` en las variables, porque son
+ * dato derivado del nombre; el `light-dark()` vive acá porque tiene que pasar
+ * por el compilador. Lightning CSS lo baja a variables de switch, así que
+ * anda igual en un navegador que no soporte `light-dark()` nativo. Con un
+ * `style` inline eso no pasaría: el navegador lo descartaría y el avatar
+ * quedaría transparente.
+ *
+ * Las tintas están acá y en `iniciales.ts`. Allá las lee el test de
+ * contraste, acá las usa el navegador; si cambia una, cambian las dos.
+ */
+.respaldo {
+  background-color: light-dark(var(--respaldo-claro), var(--respaldo-oscuro));
+  color: light-dark(#ffffff, #1a1614);
 }
 
 /*

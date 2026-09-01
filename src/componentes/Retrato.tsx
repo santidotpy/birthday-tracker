@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import type { Integrante } from '../domain/agenda.js';
-import { colorDeNombre, iniciales } from '../retratos/iniciales.js';
+import { iniciales, variablesDeRespaldo } from '../retratos/iniciales.js';
 
 /**
  * El mismo Retrato se usa enorme en la pantalla de Hoy y diminuto en una fila
@@ -34,11 +34,12 @@ export function Retrato({ integrante, conGorrito = false, tamano = 'hero' }: Pro
         {retrato && <AvatarImage src={`/retratos/${retrato}`} alt="" />}
         <AvatarFallback
           // El color sale de la paleta contrastada de `iniciales.ts`, no de un
-          // token: es dato derivado del nombre, distinto para cada persona.
-          style={{ backgroundColor: colorDeNombre(nombre) }}
+          // token: es dato derivado del nombre, distinto para cada persona. La
+          // clase `.respaldo` elige cuál de los dos según el tema.
+          style={variablesDeRespaldo(nombre)}
           // Contra el ancho del contenedor, nunca contra el viewport: con
           // unidades de viewport las iniciales del panel salían gigantes.
-          className="text-[38cqi] font-semibold text-white"
+          className="respaldo text-[38cqi] font-semibold"
         >
           {iniciales(nombre)}
         </AvatarFallback>

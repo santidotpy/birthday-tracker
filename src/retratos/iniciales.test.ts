@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { PALETA, colorDeNombre, iniciales } from './iniciales.js';
+import {
+  PALETA,
+  TINTA_CLARA,
+  TINTA_OSCURA,
+  colorDeNombre,
+  variablesDeRespaldo,
+  iniciales,
+} from './iniciales.js';
 
 describe('iniciales', () => {
   it('toma la primera del primer nombre y la del último', () => {
@@ -50,6 +57,16 @@ describe('colorDeNombre', () => {
   });
 });
 
+describe('variablesDeRespaldo', () => {
+  it('publica los dos colores del par para que los elija el CSS', () => {
+    const color = colorDeNombre('Ana Perez');
+    expect(variablesDeRespaldo('Ana Perez')).toEqual({
+      '--respaldo-claro': color.claro,
+      '--respaldo-oscuro': color.oscuro,
+    });
+  });
+});
+
 // --- Contraste -------------------------------------------------------------
 
 function canalLineal(v: number): number {
@@ -65,16 +82,46 @@ function luminancia(hex: string): number {
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }
 
-function contrasteContraBlanco(hex: string): number {
-  return 1.05 / (luminancia(hex) + 0.05);
+function contraste(a: string, b: string): number {
+  const [claro, oscuro] = [luminancia(a), luminancia(b)].sort((x, y) => y - x) as [number, number];
+  return (claro + 0.05) / (oscuro + 0.05);
 }
 
+/** Los fondos de la app, de `estilos.css`. Si cambian allá, cambian acá. */
+const FONDO_CLARO = '#faf8f6';
+const FONDO_OSCURO = '#14100e';
+
 describe('la paleta de respaldo', () => {
-  it('es legible con texto blanco en todos sus colores', () => {
-    // Un avatar de iniciales ilegible es peor que no tener foto. Si alguien
-    // suma un color a la paleta, este test decide si entra.
+  // Un avatar de iniciales ilegible es peor que no tener foto, y el respaldo
+  // no es un caso raro: hasta que el Administrador cargue fotos, es lo unico
+  // que se ve. Si alguien suma un color a la paleta, estos tests deciden si
+  // entra, en los dos temas.
+
+  it('lee sus iniciales en tema claro', () => {
     for (const color of PALETA) {
-      expect(contrasteContraBlanco(color), `${color} contra blanco`).toBeGreaterThanOrEqual(4.5);
+      expect(contraste(color.claro, TINTA_CLARA), `${color.claro} con tinta clara`).toBeGreaterThanOrEqual(4.5);
     }
+  });
+
+  it('lee sus iniciales en tema oscuro', () => {
+    for (const color of PALETA) {
+      expect(contraste(color.oscuro, TINTA_OSCURA), `${color.oscuro} con tinta oscura`).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
+  it('se despega del fondo en los dos temas', () => {
+    // Esto es lo que rompia antes de tener paleta doble: los colores estaban
+    // elegidos para llevar texto blanco, o sea todos oscuros, y en tema oscuro
+    // el circulo del Retrato se perdia contra el fondo. 3:1 es el minimo de
+    // AA para algo que es forma y no texto.
+    for (const color of PALETA) {
+      expect(contraste(color.claro, FONDO_CLARO), `${color.claro} contra el fondo claro`).toBeGreaterThanOrEqual(3);
+      expect(contraste(color.oscuro, FONDO_OSCURO), `${color.oscuro} contra el fondo oscuro`).toBeGreaterThanOrEqual(3);
+    }
+  });
+
+  it('no repite colores', () => {
+    expect(new Set(PALETA.map((c) => c.claro)).size).toBe(PALETA.length);
+    expect(new Set(PALETA.map((c) => c.oscuro)).size).toBe(PALETA.length);
   });
 });

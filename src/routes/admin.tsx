@@ -24,6 +24,7 @@ import { createFileRoute, redirect, useRouter } from '@tanstack/react-router';
 import { LogOutIcon, MonitorIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Retrato } from '../componentes/Retrato.js';
+import { SelectorDeTema } from '../componentes/SelectorDeTema.js';
 import { diaMesLargo, nombresDeMes } from '../componentes/formato.js';
 import type { Integrante } from '../domain/agenda.js';
 import { AREAS, areaONada } from '../domain/areas.js';
@@ -78,7 +79,8 @@ function Admin() {
           </span>
         </h1>
 
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
+          <SelectorDeTema compacto />
           <Button variant="outline" size="sm" render={<a href="/" />}>
             <MonitorIcon data-icon="inline-start" />
             Ver la pantalla

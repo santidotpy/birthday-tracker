@@ -1,6 +1,9 @@
 node_modules
 dist
 .output
+
+# Caché de TanStack Start.
+.tanstack/
 .env
 .env.local
 

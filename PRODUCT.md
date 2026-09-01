@@ -35,9 +35,10 @@ Es una pantalla ambiental interna, no un calendario ni una herramienta de RRHH. 
 - El 29 de febrero se observa el 1 de marzo en años no bisiestos.
 - Varias personas pueden compartir fecha y aparecen juntas. Con menos de treinta integrantes los empates son ocasionales, no la norma.
 - Quien deja la empresa se **archiva**, no se borra: conserva sus datos y desaparece de todas las vistas.
-- Retratos: el Administrador pega una URL y la app se queda con una copia propia (`docs/adr/0001`). Sin foto, muestra las iniciales sobre un color derivado del nombre.
+- Retratos: el Administrador pega una URL y la app se queda con una copia propia (`docs/adr/0001`). Sin foto, muestra las iniciales sobre un color derivado del nombre, que tiene una versión por tema.
 - Solo el Administrador se autentica. No hay registro público.
 - Cada integrante puede tener un **Área** asociada, elegida de una **lista cerrada** que vive en `src/domain/areas.ts`. Es opcional: un integrante sin área simplemente no la muestra. La lista sembrada tiene solo las dos áreas confirmadas (IT y Control de Gestión); el Administrador completa el resto editando ese archivo.
+- **Tema**: claro, oscuro, o seguir al sistema, que es el default. La elección se guarda en una cookie, o sea por dispositivo: nadie le cambia el tema a la pantalla de otro. `?tema=oscuro` en la URL lo fija y lo persiste, que es cómo se configura la TV, donde `prefers-color-scheme` reporta claro porque no sabe que es un televisor.
 - Sin notificaciones en v1: no se empuja nada a Slack ni a mail.
 - El vocabulario canónico vive en `CONTEXT.md`. Las decisiones difíciles de revertir, en `docs/adr/`.
 
@@ -62,5 +63,5 @@ No hay logo ni assets de marca. LinkedIn no puede proveer los retratos: su API n
 ## Accessibility & Inclusion
 
 - Se respeta `prefers-reduced-motion`: se cancela el confeti y se saca todo lo que se desplaza, conservando el fundido.
-- La paleta de iniciales está verificada en 4.5:1 o más contra blanco, con un test que lo hace cumplir.
+- La paleta de iniciales son pares, uno por tema, verificados con tests: 4.5:1 o más contra su tinta, y 3:1 o más contra el fondo de su tema, para que el círculo del Retrato no se pierda contra el fondo.
 - No se estableció ningún otro estándar específico del producto.

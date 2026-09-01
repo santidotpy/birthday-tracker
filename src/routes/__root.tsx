@@ -1,6 +1,9 @@
 import { HeadContent, Outlet, Scripts, createRootRoute } from '@tanstack/react-router';
 import type { ReactNode } from 'react';
 import estilos from '../estilos.css?url';
+import { resolverTema } from '../servidor/tema.js';
+import { ProveedorDeTema } from '../tema/contexto.js';
+import { type Tema, TEMA_POR_DEFECTO, temaODefecto } from '../tema/tema.js';
 
 export const Route = createRootRoute({
   head: () => ({
@@ -11,6 +14,10 @@ export const Route = createRootRoute({
     ],
     links: [{ rel: 'stylesheet', href: estilos }],
   }),
+  // El tema se resuelve en el servidor, desde la cookie, para que el HTML
+  // salga ya con el tema puesto. Con `localStorage` habría un fogonazo blanco
+  // en cada carga, que en una TV prendida todo el día se ve en cada arranque.
+  loader: () => resolverTema(),
   component: () => (
     <Documento>
       <Outlet />
@@ -29,15 +36,26 @@ export const Route = createRootRoute({
 });
 
 function Documento({ children }: Readonly<{ children: ReactNode }>) {
+  const tema = useTemaInicial();
+
   return (
-    <html lang="es-AR">
+    // Sin atributo manda `prefers-color-scheme`; con atributo manda la
+    // elección. `estilos.css` traduce esto a `color-scheme`, y de ahí sale
+    // todo lo demás vía `light-dark()`.
+    <html lang="es-AR" data-tema={tema === 'sistema' ? undefined : tema}>
       <head>
         <HeadContent />
       </head>
       <body>
-        {children}
+        <ProveedorDeTema inicial={tema}>{children}</ProveedorDeTema>
         <Scripts />
       </body>
     </html>
   );
+}
+
+/** Tolera que el loader no haya corrido: sin tema, se sigue al sistema. */
+function useTemaInicial(): Tema {
+  const datos = Route.useLoaderData({ structuralSharing: false });
+  return typeof datos === 'string' ? temaODefecto(datos) : TEMA_POR_DEFECTO;
 }
