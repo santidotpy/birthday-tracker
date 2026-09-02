@@ -45,10 +45,12 @@
 
     {"id": "d35", "nombre": "Friedrich Hayek", "fechaDeCumpleanos": {"mes": 5, "dia": 8}, "pais": "Austria", "area": "Economía", "retrato": "friedrich-hayek.webp"},
 
-    {"id": "d36", "nombre": "Donald Trump", "fechaDeCumpleanos": {"mes": 6, "dia": 14}, "pais": "Estados Unidos", "area": "Política", "retrato": "donald-trump.webp"},
+    {"id": "d36", "nombre": "Jimmy McGill", "fechaDeCumpleanos": {"mes": 11, "dia": 12}, "pais": "Estados Unidos", "area": "Legales", "retrato": "jimmy-mcgill.webp"},
 
-    {"id": "d37", "nombre": "Manuel Belgrano", "fechaDeCumpleanos": {"mes": 6, "dia": 3}, "pais": "Argentina", "area": "Historia", "retrato": null},
-    {"id": "d38", "nombre": "José de San Martín", "fechaDeCumpleanos": {"mes": 2, "dia": 25}, "pais": "Argentina", "area": "Historia", "retrato": "jose-de-san-martin.webp"},
-    {"id": "d39", "nombre": "Benjamin Franklin", "fechaDeCumpleanos": {"mes": 1, "dia": 17}, "pais": "Estados Unidos", "area": "Historia", "retrato": "benjamin-franklin.webp"}
+    {"id": "d37", "nombre": "Donald Trump", "fechaDeCumpleanos": {"mes": 6, "dia": 14}, "pais": "Estados Unidos", "area": "Política", "retrato": "donald-trump.webp"},
+
+    {"id": "d38", "nombre": "Manuel Belgrano", "fechaDeCumpleanos": {"mes": 6, "dia": 3}, "pais": "Argentina", "area": "Historia", "retrato": null},
+    {"id": "d39", "nombre": "José de San Martín", "fechaDeCumpleanos": {"mes": 2, "dia": 25}, "pais": "Argentina", "area": "Historia", "retrato": "jose-de-san-martin.webp"},
+    {"id": "d40", "nombre": "Benjamin Franklin", "fechaDeCumpleanos": {"mes": 1, "dia": 17}, "pais": "Estados Unidos", "area": "Historia", "retrato": "benjamin-franklin.webp"}
   ]
 }
