@@ -1,0 +1,42 @@
+# Autohospedaje sin Coolify. Con Coolify, ver docs/DESPLIEGUE.md.
+# Self-hosting without Coolify. With Coolify, see docs/DESPLIEGUE.md.
+#
+#   1. cp .env.example .env  y completá BETTER_AUTH_SECRET (openssl rand -base64 32)
+#      y BETTER_AUTH_URL con la URL real.
+#   2. docker compose up -d
+#   3. docker compose exec app pnpm seed:admin   (una sola vez / once)
+#
+# LEER ANTES DE EXPONERLO A INTERNET: todo menos /admin es público y sin
+# autenticación. Ver la advertencia del README.
+# READ BEFORE EXPOSING THIS TO THE INTERNET: everything except /admin is public
+# and unauthenticated. See the warning in the README.
+
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    environment:
+      # Sin default a propósito: si falta, la app se niega a arrancar y lo dice.
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?generalo con openssl rand -base64 32}
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:3000}
+      # Sólo las leen seed:admin y admin:reset. La app servida no las mira.
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      ADMIN_NAME: ${ADMIN_NAME:-Administrador}
+    volumes:
+      # La base y los Retratos. Sin esto, cada redeploy borra todo.
+      # The database and the portraits. Without this, every redeploy wipes them.
+      - datos:/datos
+    healthcheck:
+      # /salud no toca la base a propósito: una base rota se arregla mirando la
+      # pantalla de error, no reiniciando en loop.
+      test: ['CMD', 'node', '-e', "fetch('http://localhost:3000/salud').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+volumes:
+  datos:

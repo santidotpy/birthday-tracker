@@ -31,6 +31,12 @@
       "skillPath": "skills/ask-sonner/SKILL.md",
       "computedHash": "f971641be0de21b2bb5dae38bc8ef5e0ee963844e71b7fae464ec9274d2507eb"
     },
+    "create-readme": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "skillPath": "skills/create-readme/SKILL.md",
+      "computedHash": "d0ece1b2164ce1376e4ab6e98d6ac079df3a2a94f5f02224362b6a1ce2516ae9"
+    },
     "emil-design-eng": {
       "source": "emilkowalski/skill",
       "sourceType": "github",
@@ -79,6 +85,12 @@
       "skillPath": "skills/migrate-radix-to-base/SKILL.md",
       "computedHash": "4fdc31bf287f674ba6bf91a648120f7b34cd7ef370f998f2cc116fed067789c5"
     },
+    "opensource-pipeline": {
+      "source": "affaan-m/ecc",
+      "sourceType": "github",
+      "skillPath": "skills/opensource-pipeline/SKILL.md",
+      "computedHash": "2e6217c2ab6d038ffa4aa1bb9c74512ed1df96465500f9c57e04eb9fa66248e5"
+    },
     "pick-ui-library": {
       "source": "emilkowalski/skill",
       "sourceType": "github",
@@ -96,6 +108,12 @@
       "sourceType": "github",
       "skillPath": "skills/review-animations/SKILL.md",
       "computedHash": "6f8d633d7884c1390eff7af4bfaf7a450e798f117e1d49a555e00819dc877f64"
+    },
+    "secret-scanning": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "skillPath": "skills/secret-scanning/SKILL.md",
+      "computedHash": "cc7de79bee80775578227a370637d0a83aa0f2cbec28374058899859261d2081"
     },
     "shadcn": {
       "source": "shadcn/ui",
