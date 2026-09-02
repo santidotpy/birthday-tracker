@@ -34,7 +34,7 @@ somebody's birthday, which is the worst possible day for it to show up.
 ## 3. Decisions that are hard to reverse live in `docs/adr/`
 
 Before proposing an architectural change, check whether it is already answered
-there. Seven decisions are recorded with their reasoning — among them: dates are
+there. Eight decisions are recorded with their reasoning — among them: dates are
 always evaluated in a single timezone, date arithmetic is hand-rolled rather
 than delegated to a date library, portraits are copied rather than hot-linked,
 and the server is built from server functions rather than HTTP route handlers.

@@ -31,7 +31,7 @@ Hay dos escenarios que sólo se ven levantando el server con el entorno cambiado
 
 - `CONTEXT.md` — el glosario del dominio. **Leelo antes de nombrar algo nuevo.** Fija distinciones que el código depende de que se respeten, sobre todo: el **Próximo cumpleaños** es estrictamente posterior a la fecha que se mira y nunca la incluye, mientras que la **Agenda** sí la incluye y arranca ahí, no en enero.
 - `PRODUCT.md` — para quién es y qué decidió el Administrador.
-- `docs/adr/` — siete decisiones difíciles de revertir, con el motivo. Si algo parece raro, probablemente esté explicado ahí.
+- `docs/adr/` — ocho decisiones difíciles de revertir, con el motivo. Si algo parece raro, probablemente esté explicado ahí.
 
 ## Arquitectura
 
@@ -65,6 +65,17 @@ Usá `.validator()`, no el `.inputValidator()` deprecado.
 ### Ingesta de Retratos
 
 El Administrador pega una URL y la app se queda con una copia propia (ADR 0001: las URLs firmadas de LinkedIn vencen). `src/retratos/ingesta.ts` bloquea la red privada antes de bajar nada y **revalida en cada redirección** (ADR 0005). El flag `permitirRedPrivada` existe solo para los tests, que levantan un servidor en 127.0.0.1: no lo expongas nunca en una ruta ni en un formulario.
+
+### El demo estático
+
+`pnpm build:demo` compila la misma app con `VITE_DEMO=1` y la deja en `dist/client`, lista para GitHub Pages. Sale de `main`: no hay rama `demo`. El porqué está en el ADR 0008.
+
+Lo que hay que tener presente al tocar código:
+
+- **Tres módulos se reemplazan por alias de Vite**: `servidor/consultas.ts`, `servidor/tema.ts` y `servidor/sesion.ts`, por sus gemelos de `src/demo/`. Si le cambiás la firma a alguno de esos, **el demo se rompe y `pnpm test` no se entera** — los reemplazos son de build, no de tipos. Lo que lo agarra es `pnpm build:demo`, que corre en CI.
+- Los alias van por expresión regular, no por prefijo: el mismo módulo se importa desde profundidades distintas.
+- **`import.meta.env.VITE_DEMO` es la única guarda del viaje en el tiempo** (`?hoy=` en `frescura.ts`). Vite la resuelve al compilar, así que en el build normal es código muerto. No la cambies por una variable de runtime.
+- La raíz del demo se sirve como cáscara de SPA a propósito. Prerenderizarla dejaría clavado el día del build.
 
 ### Tema
 

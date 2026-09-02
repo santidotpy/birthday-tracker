@@ -7,7 +7,7 @@ Hecha para una empresa chica —menos de treinta personas— para dejarla prendi
 semanas en un televisor de la oficina. Muestra quién cumple hoy, quién sigue y
 cuánto falta. Nadie inicia sesión, nadie busca, nadie filtra.
 
-**[Read in English →](README.md)**
+**[Ver el demo](https://santidotpy.github.io/birthday-tracker/)** · **[Read in English →](README.md)**
 
 > [!CAUTION]
 > **La app no tiene autenticación, y es a propósito.** Todo menos `/admin` es
@@ -165,7 +165,7 @@ Algunas decisiones que explican la forma del código:
   directo, así que la guarda de la ruta no la protege.
 - **El 29 de febrero** se observa el 1 de marzo en años no bisiestos.
 
-El porqué de las difíciles de revertir está en [`docs/adr/`](docs/adr/): siete
+El porqué de las difíciles de revertir está en [`docs/adr/`](docs/adr/): ocho
 decisiones, cada una con la alternativa que se descartó y el motivo.
 
 ## Documentación
@@ -174,9 +174,32 @@ decisiones, cada una con la alternativa que se descartó y el motivo.
 | --- | --- |
 | [`CONTEXT.md`](CONTEXT.md) | El glosario del dominio. Leelo antes de nombrar algo nuevo. |
 | [`PRODUCT.md`](PRODUCT.md) | Para quién es, y qué decidió no ser. |
-| [`docs/adr/`](docs/adr/) | Siete decisiones de arquitectura, con su razonamiento. |
+| [`docs/adr/`](docs/adr/) | Ocho decisiones de arquitectura, con su razonamiento. |
 | [`docs/DESPLIEGUE.md`](docs/DESPLIEGUE.md) | El paso a paso del despliegue en Coolify. |
 | [`CLAUDE.md`](CLAUDE.md) | Notas para agentes de IA — y el recorrido más rápido por las trampas. |
+
+## El demo
+
+El [demo](https://santidotpy.github.io/birthday-tracker/) es la misma app
+compilada con `VITE_DEMO=1`, que reemplaza tres módulos —la fuente de datos, el
+tema y la sesión— y nada más. Se sirve desde GitHub Pages saliendo de `main`,
+así que no se puede desincronizar del código. No hay rama `demo`.
+
+El elenco son personajes históricos y personas famosas; los nombres y las fechas
+son hechos, y los Retratos están vacíos a propósito, así que cada avatar es el
+respaldo de iniciales haciendo su trabajo.
+
+Dos cosas para probar:
+
+- `?hoy=1971-09-05` fija el "hoy", porque con cuarenta personas repartidas en el
+  año si no verías la cuenta regresiva y nunca el confeti.
+- `?hoy=2027-03-01` muestra a Rossini, nacido un 29 de febrero, festejando el 1
+  de marzo en un año no bisiesto.
+
+El panel de administración no es parte del demo: escribe en SQLite y baja
+Retratos, las dos cosas de Node. `/entrar` igual se ve, y lo explica.
+
+Para construirlo: `pnpm build:demo`, que deja la salida en `dist/client`.
 
 ## Desarrollo
 

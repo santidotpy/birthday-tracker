@@ -5,6 +5,7 @@ import {
   hoyEnArgentina,
   mismaFecha,
   msHastaProximaMedianoche,
+  parsearFechaISO,
 } from '../domain/fechas.js';
 
 /**
@@ -42,10 +43,32 @@ export const INTERVALO_DE_FONDO_MS = 30 * 60 * 1_000;
  * también se revisa cada vez que la pestaña vuelve a estar visible, y cada
  * revisión se hace contra el reloj en vez de confiar en cuándo disparó.
  */
+/**
+ * El "hoy" fijado por `?hoy=AAAA-MM-DD`, sólo en el demo.
+ *
+ * Existe porque con cuarenta personas repartidas en el año, quien abre el demo
+ * cae en un cumpleaños una vez de cada doce: sin esto, casi nadie llega a ver
+ * el confeti, que es el mejor momento de la app. Navegar a `/2026-06-24` no
+ * alcanza, porque esa ruta muestra de quién fue el cumpleaños pero con `esHoy`
+ * en false y sin festejo — que es la decisión de producto correcta y
+ * exactamente lo contrario de lo que un demo necesita.
+ *
+ * `import.meta.env.VITE_DEMO` lo resuelve Vite al compilar, así que en el build
+ * normal esto es código muerto y no llega al bundle.
+ */
+function hoyFijadoPorLaUrl(): FechaSimple | null {
+  if (!import.meta.env.VITE_DEMO) return null;
+  if (typeof window === 'undefined') return null;
+  return parsearFechaISO(new URLSearchParams(window.location.search).get('hoy') ?? '');
+}
+
 export function useHoyEnArgentina(): FechaSimple {
-  const [hoy, setHoy] = useState(hoyEnArgentina);
+  const [hoy, setHoy] = useState(() => hoyFijadoPorLaUrl() ?? hoyEnArgentina());
 
   useEffect(() => {
+    // Con la fecha fijada no hay medianoche que cruzar: queda quieta.
+    if (hoyFijadoPorLaUrl()) return;
+
     let temporizador: ReturnType<typeof setTimeout>;
 
     function revisar() {

@@ -17,6 +17,7 @@
     "admin:reset": "tsx scripts/reset-admin.ts",
     "dev": "vite dev",
     "build": "vite build",
+    "build:demo": "node scripts/build-demo.mjs",
     "start": "node servidor/produccion.mjs",
     "preview": "vite preview"
   },

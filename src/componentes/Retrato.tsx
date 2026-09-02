@@ -36,7 +36,9 @@ export function Retrato({ integrante, conGorrito = false, tamano = 'hero' }: Pro
   return (
     <div className={cn('relative aspect-square @container', TAMANOS[tamano])}>
       <Avatar className="size-full">
-        {retrato && <AvatarImage src={`/retratos/${retrato}`} alt="" />}
+        {/* `BASE_URL` es `/` salvo en el demo, que GitHub Pages sirve bajo
+            `/<repo>/`. Sin esto, ahí las fotos salen 404. */}
+        {retrato && <AvatarImage src={`${import.meta.env.BASE_URL}retratos/${retrato}`} alt="" />}
         <AvatarFallback
           // El color sale de la paleta contrastada de `iniciales.ts`, no de un
           // token: es dato derivado del nombre, distinto para cada persona. La

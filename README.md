@@ -6,7 +6,7 @@ Built for a small company — fewer than thirty people — to leave running on a
 in the office for weeks at a time. It shows who is celebrating today, who is
 next, and how long until then. Nobody logs in, nobody searches, nobody filters.
 
-**[Leer en castellano →](README.es.md)**
+**[Live demo](https://santidotpy.github.io/birthday-tracker/)** · **[Leer en castellano →](README.es.md)**
 
 > [!CAUTION]
 > **This app is unauthenticated by design.** Everything except `/admin` is
@@ -165,7 +165,7 @@ A few decisions that explain the shape of the code:
 - **February 29th** is observed on March 1st in non-leap years.
 
 The reasoning behind the hard-to-reverse ones is recorded in
-[`docs/adr/`](docs/adr/) — seven decisions, each with the alternative that was
+[`docs/adr/`](docs/adr/) — eight decisions, each with the alternative that was
 rejected and why.
 
 ## Documentation
@@ -174,9 +174,32 @@ rejected and why.
 | --- | --- |
 | [`CONTEXT.md`](CONTEXT.md) | The domain glossary. Read it before naming anything. |
 | [`PRODUCT.md`](PRODUCT.md) | Who it is for, and what it deliberately is not. |
-| [`docs/adr/`](docs/adr/) | Seven architectural decisions, with their reasoning. |
+| [`docs/adr/`](docs/adr/) | Eight architectural decisions, with their reasoning. |
 | [`docs/DESPLIEGUE.md`](docs/DESPLIEGUE.md) | Step-by-step Coolify deployment. |
 | [`CLAUDE.md`](CLAUDE.md) | Working notes for AI coding agents — also the fastest tour of the traps. |
+
+## The demo
+
+The [live demo](https://santidotpy.github.io/birthday-tracker/) is the same app
+built with `VITE_DEMO=1`, which swaps three modules — the data source, the theme
+resolver and the session — and nothing else. It is served from GitHub Pages out
+of `main`, so it cannot drift from the code. There is no `demo` branch.
+
+Its cast is historical figures and famous people; the names and dates are facts
+and the portraits are deliberately absent, so every avatar is the initials
+fallback doing its job.
+
+Two things worth trying:
+
+- `?hoy=2027-09-05` pins "today", because with forty people spread across the
+  year you would otherwise see the countdown and never the confetti.
+- `?hoy=2027-03-01` shows Rossini, born February 29th, celebrating on March 1st
+  in a non-leap year.
+
+The admin panel is not part of the demo: it writes to SQLite and downloads
+portraits, both of which need a server. `/entrar` still renders, and says so.
+
+Build it yourself with `pnpm build:demo` — the output lands in `dist/client`.
 
 ## Development
 

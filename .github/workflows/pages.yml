@@ -1,0 +1,57 @@
+name: Demo
+
+# El demo estático en GitHub Pages. Sale del mismo `main` que la app: no hay
+# rama `demo` que mantener sincronizada a mano.
+# Ver docs/adr/0008-el-demo-es-un-modo-de-build.md.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Un solo despliegue a la vez, y si entra uno nuevo mientras hay otro en curso,
+# gana el nuevo: el demo no tiene estado que perder.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  construir:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - uses: actions/configure-pages@v5
+        id: pages
+
+      # `base` tiene que coincidir con el camino donde Pages sirve el sitio:
+      # `/<repo>/`, o `/` si hay dominio propio. `configure-pages` ya lo calculó.
+      - run: pnpm build:demo
+        env:
+          DEMO_BASE: ${{ steps.pages.outputs.base_path }}/
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/client
+
+  desplegar:
+    needs: construir
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.despliegue.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: despliegue
