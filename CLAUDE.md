@@ -25,6 +25,8 @@ pnpm seed:admin                       # crea el único administrador, con ADMIN_
 
 Los tests corren en entorno Node, sin navegador. Los de componentes usan `renderToStaticMarkup`, que tampoco lo necesita.
 
+Hay dos escenarios que sólo se ven levantando el server con el entorno cambiado, no con los tests: `DATABASE_PATH` a una carpeta nueva (tiene que arrancar vacío, no romperse) y `MIGRATIONS_PATH` a una que no existe (tiene que dar la pantalla de error en castellano).
+
 ## Dónde vive el porqué
 
 - `CONTEXT.md` — el glosario del dominio. **Leelo antes de nombrar algo nuevo.** Fija distinciones que el código depende de que se respeten, sobre todo: el **Próximo cumpleaños** es estrictamente posterior a la fecha que se mira y nunca la incluye, mientras que la **Agenda** sí la incluye y arranca ahí, no en enero.
@@ -52,7 +54,11 @@ Usá `.validator()`, no el `.inputValidator()` deprecado.
 
 ### Los datos viven fuera del repo
 
-`DATABASE_PATH` y `RETRATOS_PATH` apuntan al **mismo volumen persistente** de Coolify. Si `datos/` queda adentro del contenedor, cada redeploy borra los cumpleaños y las fotos, y la app arranca vacía sin avisar.
+`DATABASE_PATH` y `RETRATOS_PATH` apuntan al **mismo volumen persistente** de Coolify. Si `datos/` queda adentro del contenedor, cada redeploy borra los cumpleaños y las fotos.
+
+`db()` migra al abrir, no en un paso aparte del despliegue. Es a propósito: `new Database()` **crea el archivo en vez de fallar**, así que sin migrar ahí un volumen recién montado daba una base sin tablas y la primera consulta moría con `no such table: integrantes`. Ahora ese caso arranca en la pantalla de "Todavía no hay nadie" y deja un `[base] No existía…` en el log — que es la única señal que distingue un primer despliegue de un volumen perdido.
+
+**La carpeta `drizzle/` tiene que estar en la imagen.** Sin ella no hay migraciones que correr y la app entra en la pantalla de error.
 
 **La base de desarrollo tiene personas reales de la empresa.** No inventes, completes ni reasignes sus datos —área, país, foto— sin que el Administrador los confirme.
 
@@ -78,6 +84,14 @@ Movimiento reducido conserva la cascada pero se queda solo con el fundido; el cr
 
 Los dígitos de la cuenta regresiva **no** se animan, a propósito: cambian una vez por segundo y animarlos los haría ilegibles.
 
+### La cuenta regresiva y la hidratación
+
+Los números de `CuentaRegresiva` llevan `suppressHydrationWarning`. **No lo saques.** Son la hora: el servidor los pinta en un segundo y el navegador hidrata en el siguiente, así que nunca coinciden. Sin eso, React da la hidratación por fallida y **reconstruye toda la pantalla en el cliente**, dejando una ventana en la que los clics no hacen nada — el síntoma es que "Ver todos los cumpleaños" no abre.
+
+No se ve en los tests: `renderToStaticMarkup` no hidrata, y la prop no deja rastro en el HTML. Se ve en la consola del navegador. Hay una guarda en `CuentaRegresiva.test.ts` que mira el archivo, que es lo único verificable sin navegador.
+
+Regla general: cualquier cosa que dependa del reloj o del azar y se renderice en el servidor tiene el mismo problema.
+
 ### Tamaños: el destino es un televisor
 
 Los techos de `clamp()` en `Retrato.tsx` y los pasos `2xl:` de tipografía existen porque esta pantalla vive en una TV de 2500px que se mira de lejos. Con los topes bajos de antes, todo quedaba del mismo tamaño en un celular que en la TV, flotando en un vacío enorme. Si tocás tamaños, miralo a 2500px de ancho, no solo en la laptop.
@@ -96,6 +110,18 @@ La app está pensada para quedar abierta días, y en algún momento meses en una
 - Base UI no publica `value` en el DOM: la opción activa se reconoce por `aria-pressed`.
 
 Iconos en botones con `data-icon="inline-start"`, sin clases de tamaño.
+
+## Cuenta del Administrador
+
+`pnpm seed:admin` crea la única cuenta con `ADMIN_EMAIL` y `ADMIN_PASSWORD` del `.env`. De ahí en más se cambian desde el panel, en el botón **Cuenta** del encabezado.
+
+**La contraseña tiene un mínimo de 8 caracteres** (el default de Better Auth). Con menos, el seed falla y la cuenta no se crea.
+
+`pnpm admin:reset` es la única salida si se pierde la contraseña: no hay recuperación por correo porque la app no manda mails. Borra la cuenta y la rehace con lo que diga el `.env`; **no toca los Integrantes**, que viven en otra tabla.
+
+El email **no** pasa por `auth.api.changeEmail`: Better Auth 1.7 exige un mailer configurado aunque el email no esté verificado, y contesta `Verification email isn't enabled` sin cambiar nada. Como la app no manda correos por decisión de producto, `src/auth/cuenta.ts` actualiza la fila. Es seguro porque `account.account_id` guarda el id del usuario, no el email, y las sesiones cuelgan de `user_id` — hay un test que lo fija por si eso cambiara.
+
+Los mensajes de error de Better Auth son en inglés y no se configuran: `motivo()` en `sesion.ts` traduce los que pueden aparecer y manda el resto a un mensaje propio, en vez de filtrar el original a una pantalla en castellano.
 
 ## Windows
 

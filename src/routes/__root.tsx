@@ -1,5 +1,6 @@
 import { HeadContent, Outlet, Scripts, createRootRoute } from '@tanstack/react-router';
 import type { ReactNode } from 'react';
+import { PantallaDeError } from '../componentes/PantallaDeError.js';
 import estilos from '../estilos.css?url';
 import { resolverTema } from '../servidor/tema.js';
 import { ProveedorDeTema } from '../tema/contexto.js';
@@ -21,6 +22,11 @@ export const Route = createRootRoute({
   component: () => (
     <Documento>
       <Outlet />
+    </Documento>
+  ),
+  errorComponent: ({ error, reset }) => (
+    <Documento>
+      <PantallaDeError error={error} reintentar={reset} />
     </Documento>
   ),
   notFoundComponent: () => (

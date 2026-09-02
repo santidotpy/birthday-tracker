@@ -40,7 +40,13 @@ export function PantallaDeCumpleanos({ integrantes, fecha, esHoy }: Props) {
   );
 
   return cumpleaneros.length > 0 ? (
-    <Celebracion cumpleaneros={cumpleaneros} fecha={fecha} proximo={proximo} agenda={agenda} />
+    <Celebracion
+      cumpleaneros={cumpleaneros}
+      fecha={fecha}
+      esHoy={esHoy}
+      proximo={proximo}
+      agenda={agenda}
+    />
   ) : (
     <DiaTranquilo fecha={fecha} esHoy={esHoy} proximo={proximo} agenda={agenda} />
   );
@@ -51,21 +57,50 @@ type Proximo = ReturnType<typeof proximoCumpleanos>;
 function Celebracion({
   cumpleaneros,
   fecha,
+  esHoy,
   proximo,
   agenda,
 }: {
   cumpleaneros: Integrante[];
   fecha: FechaSimple;
+  esHoy: boolean;
   proximo: Proximo;
   agenda: React.ReactNode;
 }) {
   const varios = cumpleaneros.length > 1;
+  // Mirar una fecha vieja agrega la línea con la fecha arriba de todo, así que
+  // lo demás entra un lugar más tarde.
+  const desde = esHoy ? 0 : 1;
 
   return (
     <main className={PANTALLA}>
-      <Confetti clave={comoISO(fecha)} />
+      {/*
+        El festejo es de hoy, no de la fecha que se esté mirando. Navegar al
+        cumpleaños de la semana pasada tiene que mostrar de quién fue, no
+        volver a festejarlo: sin confeti y sin saludo, que en pasado no va.
+      */}
+      {esHoy && <Confetti clave={comoISO(fecha)} />}
 
-      <div className="entra flex flex-wrap items-end justify-center gap-4 sm:gap-10" style={enOrden(0)}>
+      {!esHoy && (
+        <p
+          className="entra m-0 text-sm tracking-wide lowercase text-muted-foreground 2xl:text-xl"
+          style={enOrden(0)}
+        >
+          <time dateTime={comoISO(fecha)}>{fechaLarga(fecha)}</time>
+        </p>
+      )}
+
+      <div
+        className={
+          // El gorrito sale un 20% por encima de su caja, así que se le mete
+          // encima a lo que tenga arriba. Sólo pasa mirando otra fecha, que es
+          // cuando aparece la línea con el día: se le reserva ese 20%, calcado
+          // del `clamp` del Retrato en `Retrato.tsx`.
+          'entra flex flex-wrap items-end justify-center gap-4 sm:gap-10' +
+          (esHoy ? '' : ' mt-[clamp(1.8rem,4.8vw,5.2rem)]')
+        }
+        style={enOrden(desde)}
+      >
         {cumpleaneros.map((integrante) => (
           <figure key={integrante.id} className="m-0 flex flex-col items-center gap-3">
             <Retrato integrante={integrante} conGorrito tamano={varios ? 'medio' : 'hero'} />
@@ -81,15 +116,25 @@ function Celebracion({
 
       <h1
         className="entra m-0 text-3xl leading-tight font-bold tracking-tight text-balance sm:text-5xl sm:tracking-[-0.03em] lg:text-7xl lg:tracking-[-0.035em] 2xl:text-8xl 2xl:tracking-[-0.04em]"
-        style={enOrden(1)}
+        style={enOrden(desde + 1)}
       >
-        ¡Feliz cumpleaños,{' '}
-        <span className="text-primary">{unirNombres(cumpleaneros.map((i) => i.nombre))}!</span>
+        {esHoy ? (
+          <>
+            ¡Feliz cumpleaños,{' '}
+            <span className="text-primary">{unirNombres(cumpleaneros.map((i) => i.nombre))}!</span>
+          </>
+        ) : (
+          <>
+            Cumple años{' '}
+            <span className="text-primary">{unirNombres(cumpleaneros.map((i) => i.nombre))}</span>
+          </>
+        )}
       </h1>
 
       {/* Con una sola persona el área va suelta; con varias va bajo cada retrato. */}
       {!varios && cumpleaneros[0]?.area && (
-        <Badge variant="secondary" className="entra px-3 py-1 text-sm sm:text-base 2xl:px-4 2xl:py-1.5 2xl:text-xl" style={enOrden(2)}>
+        <Badge variant="secondary" className="entra px-3 py-1 text-sm sm:text-base 2xl:px-4 2xl:py-1.5 2xl:text-xl"
+          style={enOrden(desde + 2)}>
           {cumpleaneros[0].area}
         </Badge>
       )}
@@ -97,7 +142,7 @@ function Celebracion({
       {proximo && (
         <p
           className="entra m-0 max-w-[46ch] leading-relaxed text-balance text-muted-foreground sm:text-lg 2xl:text-2xl"
-          style={enOrden(3)}
+          style={enOrden(desde + 3)}
         >
           El próximo cumpleaños es de{' '}
           <strong className="font-semibold text-foreground">

@@ -5,6 +5,7 @@ import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import { createFileRoute, redirect, useRouter } from '@tanstack/react-router';
+import { CampoDeContrasena } from '../componentes/CampoDeContrasena.js';
 import { useState } from 'react';
 import { iniciarSesion, sesionActual } from '../servidor/sesion.js';
 
@@ -64,13 +65,11 @@ function Entrar() {
 
               <Field data-invalid={error ? true : undefined}>
                 <FieldLabel htmlFor="password">Contraseña</FieldLabel>
-                <Input
+                <CampoDeContrasena
                   id="password"
                   name="password"
-                  type="password"
                   autoComplete="current-password"
-                  required
-                  aria-invalid={error ? true : undefined}
+                  invalido={Boolean(error)}
                 />
               </Field>
 

@@ -23,6 +23,14 @@ const dosDigitos = (n: number) => String(n).padStart(2, '0');
  * Recalcula contra el reloj en cada tick en vez de restarle uno a un contador:
  * los navegadores estrangulan los intervalos en pestañas de fondo, y un
  * contador que se decrementa se desincroniza sin que nadie se entere.
+ *
+ * Los números llevan `suppressHydrationWarning` porque son la hora: el
+ * servidor los pinta en un segundo y el navegador hidrata en el siguiente, así
+ * que **nunca** van a coincidir. Sin esto, React daba la hidratación por
+ * fallida y volvía a construir toda la pantalla en el cliente, dejando una
+ * ventana en la que los clics no hacían nada —tocar "Ver todos los
+ * cumpleaños" en ese momento no abría nada—. El primer tick corrige el valor
+ * a los milisegundos, así que lo único que se "acepta" es un segundo viejo.
  */
 export function CuentaRegresiva({ hasta }: Props) {
   const [ms, setMs] = useState(() => msHastaInicioDe(hasta));
@@ -41,7 +49,10 @@ export function CuentaRegresiva({ hasta }: Props) {
     <p className="m-0 flex items-baseline gap-2 tabular-nums 2xl:gap-4" role="timer">
       {dias > 0 && (
         <>
-          <span className="text-4xl font-bold tracking-tight sm:text-6xl sm:tracking-[-0.035em] 2xl:text-8xl 2xl:tracking-[-0.04em]">
+          <span
+            className="text-4xl font-bold tracking-tight sm:text-6xl sm:tracking-[-0.035em] 2xl:text-8xl 2xl:tracking-[-0.04em]"
+            suppressHydrationWarning
+          >
             {dias}
           </span>
           <span className="text-muted-foreground sm:text-lg 2xl:text-2xl">
@@ -49,7 +60,10 @@ export function CuentaRegresiva({ hasta }: Props) {
           </span>
         </>
       )}
-      <span className="text-3xl font-semibold tracking-tight sm:text-5xl sm:tracking-[-0.03em] 2xl:text-7xl 2xl:tracking-[-0.035em]">
+      <span
+        className="text-3xl font-semibold tracking-tight sm:text-5xl sm:tracking-[-0.03em] 2xl:text-7xl 2xl:tracking-[-0.035em]"
+        suppressHydrationWarning
+      >
         {dosDigitos(horas)}:{dosDigitos(minutos)}:{dosDigitos(segundos)}
       </span>
     </p>

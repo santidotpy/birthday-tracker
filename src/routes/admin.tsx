@@ -24,6 +24,7 @@ import { createFileRoute, redirect, useRouter } from '@tanstack/react-router';
 import { LogOutIcon, MonitorIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Retrato } from '../componentes/Retrato.js';
+import { Cuenta } from '../componentes/Cuenta.js';
 import { SelectorDeTema } from '../componentes/SelectorDeTema.js';
 import { diaMesLargo, nombresDeMes } from '../componentes/formato.js';
 import type { Integrante } from '../domain/agenda.js';
@@ -50,7 +51,11 @@ const ETIQUETAS_DE_AREA = {
 
 export const Route = createFileRoute('/admin')({
   beforeLoad: async () => {
-    if (!(await sesionActual())) throw redirect({ to: '/entrar' });
+    const admin = await sesionActual();
+    if (!admin) throw redirect({ to: '/entrar' });
+    // Viaja como contexto de la ruta para que el diálogo de Cuenta sepa con
+    // qué email se entró, sin pedir la sesión una segunda vez.
+    return { admin };
   },
   loader: () => listarParaAdmin(),
   component: Admin,
@@ -58,6 +63,7 @@ export const Route = createFileRoute('/admin')({
 
 function Admin() {
   const integrantes = Route.useLoaderData();
+  const { admin } = Route.useRouteContext();
   const router = useRouter();
   const [editando, setEditando] = useState<Integrante | null>(null);
 
@@ -81,6 +87,7 @@ function Admin() {
 
         <div className="flex items-center gap-2">
           <SelectorDeTema compacto />
+          <Cuenta emailActual={admin.email} />
           <Button variant="outline" size="sm" render={<a href="/" />}>
             <MonitorIcon data-icon="inline-start" />
             Ver la pantalla

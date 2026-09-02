@@ -27,12 +27,13 @@ Es una pantalla ambiental interna, no un calendario ni una herramienta de RRHH. 
 - Autohospedada en un server Ubuntu de la empresa con Coolify, accesible solo desde la oficina o por VPN.
 - Todas las fechas se evalúan en horario de Argentina, sin importar desde dónde se mire (`docs/adr/0003`).
 - El padrón se mantiene a mano. No hay integración con ningún sistema de RRHH ni con LinkedIn.
-- La base y las fotos viven en un volumen persistente. Si queda dentro del contenedor, cada redeploy borra todo y la app arranca vacía sin avisar.
+- La base y las fotos viven en un volumen persistente. Si queda dentro del contenedor, cada redeploy borra todo. La app se prepara sola —crea el archivo y aplica las migraciones al arrancar—, así que un volumen nuevo arranca vacío en vez de romperse, y avisa en el log.
 
 ## Capabilities and Constraints
 
 - Un cumpleaños es **día y mes**. El año de nacimiento no se guarda, por decisión explícita: la app nunca muestra la edad de nadie.
 - El 29 de febrero se observa el 1 de marzo en años no bisiestos.
+- **El festejo es del día, no de la fecha que se mire.** Navegar al cumpleaños de la semana pasada muestra de quién fue —retrato, nombre, área— pero sin confeti y sin saludo, y con la fecha a la vista.
 - Varias personas pueden compartir fecha y aparecen juntas. Con menos de treinta integrantes los empates son ocasionales, no la norma.
 - Quien deja la empresa se **archiva**, no se borra: conserva sus datos y desaparece de todas las vistas.
 - Retratos: el Administrador pega una URL y la app se queda con una copia propia (`docs/adr/0001`). Sin foto, muestra las iniciales sobre un color derivado del nombre, que tiene una versión por tema.

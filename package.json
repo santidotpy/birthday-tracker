@@ -10,6 +10,7 @@
     "db:migrate": "drizzle-kit migrate",
     "auth:generate": "auth generate --config src/auth/servidor.ts --output src/db/schema-auth.ts",
     "seed:admin": "tsx scripts/seed-admin.ts",
+    "admin:reset": "tsx scripts/reset-admin.ts",
     "dev": "vite dev",
     "build": "vite build",
     "start": "node servidor/produccion.mjs",
