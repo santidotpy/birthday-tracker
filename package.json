@@ -2,6 +2,10 @@
   "name": "birthday-tracker",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@10.33.1",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
@@ -15,20 +19,6 @@
     "build": "vite build",
     "start": "node servidor/produccion.mjs",
     "preview": "vite preview"
-  },
-  "devDependencies": {
-    "@types/better-sqlite3": "^9.6.0",
-    "@types/canvas-confetti": "^1.9.0",
-    "@types/node": "^26.4.0",
-    "@types/react": "^19.2.18",
-    "@types/react-dom": "^19.2.5",
-    "@vitejs/plugin-react": "^6.1.1",
-    "drizzle-kit": "^0.31.10",
-    "nitro": "3.0.260610-beta",
-    "tsx": "^4.23.13",
-    "typescript": "^5.7.2",
-    "vite": "^8.2.2",
-    "vitest": "^4.1.11"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",
@@ -48,5 +38,19 @@
     "sirv": "^3.0.2",
     "tailwind-merge": "^3.6.0",
     "tailwindcss": "^4.3.3"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^9.6.0",
+    "@types/canvas-confetti": "^1.9.0",
+    "@types/node": "^26.4.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.5",
+    "@vitejs/plugin-react": "^6.1.1",
+    "drizzle-kit": "^0.31.10",
+    "nitro": "3.0.260610-beta",
+    "tsx": "^4.23.13",
+    "typescript": "^5.7.2",
+    "vite": "^8.2.2",
+    "vitest": "^4.1.11"
   }
 }

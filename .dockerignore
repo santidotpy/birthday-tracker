@@ -1,0 +1,20 @@
+# El volumen persistente y todo lo que sea una base: nunca entran a la imagen.
+datos/
+*.sqlite
+*.sqlite-*
+
+# Secretos.
+.env
+.env.local
+
+node_modules
+dist
+.output
+.tanstack
+
+.git
+.github
+.agents
+.claude
+*.md
+docs/

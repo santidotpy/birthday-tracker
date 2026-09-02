@@ -129,6 +129,13 @@ Los mensajes de error de Better Auth son en inglés y no se configuran: `motivo(
 - `node -e` y `npx tsx -e` no imprimen nada en este entorno: usá archivos de script.
 - Cada llamada a la shell es un proceso nuevo; un `export` no persiste. Poné las variables de entorno en la misma línea del comando.
 
-## Pendiente conocido
+## Despliegue
 
-`.env` todavía usa el `BETTER_AUTH_SECRET` de ejemplo. Antes de desplegar hay que reemplazarlo por uno real (`openssl rand -base64 32`).
+El paso a paso está en `docs/DESPLIEGUE.md`. Lo que conviene saber sin abrirlo:
+
+- La imagen se construye con el `Dockerfile` del repo, base **Debian (`node:22-slim`), no Alpine**: `better-sqlite3` y `sharp` traen binarios para glibc y en musl hay que compilarlos enteros.
+- La imagen final **incluye las dependencias de desarrollo, a propósito**: sin `tsx` no se puede correr `pnpm admin:reset` adentro del contenedor, que es la única forma de recuperar el acceso al panel.
+- `servidor/produccion.mjs` corre `revisarElEntorno()` antes de servir nada, y sólo en producción. Si falta el secreto, la URL pública o los caminos, no arranca y lo explica en castellano.
+- Esa misma guarda detecta **el volumen sin montar** comparando el número de dispositivo de la carpeta de datos con el de `/`, porque el `Dockerfile` define `DATABASE_PATH` y entonces la revisión de "falta la variable" pasa siempre. Sólo pregunta si hay `/.dockerenv`: fuera de un contenedor, compartir dispositivo con la raíz es lo normal.
+- `/salud` es para el healthcheck y **no toca la base** a propósito: una base rota se arregla mirando la pantalla de error, no reiniciando en loop.
+- Los Retratos se sirven con `sirv(..., { dev: true })` y la carpeta se crea con `mkdirSync` antes. Las dos líneas parecen de más y no lo son: sin `dev`, `sirv` indexa la carpeta una sola vez al arrancar y **cada foto subida después queda en 404 hasta el próximo reinicio**; sin el `mkdirSync`, ese mismo recorrido inicial muere con ENOENT en un volumen recién montado. `dev` impone su propio `Cache-Control`, así que el inmutable se pone en la respuesta antes de delegar. Hay guardas en `src/servidor/produccion.test.ts`, que es lo único verificable sin construir.
