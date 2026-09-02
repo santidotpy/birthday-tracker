@@ -55,7 +55,15 @@ el botón, así que el stub contesta en castellano.
 
 **Los Retratos del demo van vacíos.** Sin foto la app muestra las iniciales
 sobre un color derivado del nombre, que es una función real y no un placeholder.
-Agregar fotos es agregar archivos a `public/retratos/` y el nombre al JSON.
+Agregar fotos es poner archivos en `src/demo/publico/retratos/` y el nombre en
+el campo `retrato` del JSON.
+
+**La carpeta pública es del demo y no de la app.** `publicDir` apunta a
+`src/demo/publico` sólo con `VITE_DEMO=1`, y a nada en el build normal. Con la
+de Vite por defecto (`public/`) las fotos del demo se copiaban **también al
+build de producción** y terminaban adentro de la imagen Docker de cualquiera que
+autohospede. Los Retratos de verdad no salen del repo: viven en el volumen y los
+sirve `servidor/produccion.mjs`.
 
 **`Retrato.tsx` arma la URL con `import.meta.env.BASE_URL`.** GitHub Pages sirve
 en `/<repo>/`; con el camino absoluto de antes, ahí las fotos daban 404.

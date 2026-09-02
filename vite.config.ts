@@ -56,6 +56,15 @@ const aliasDelDemo = DEMO
 export default defineConfig({
   server: { port: 3000 },
   base: DEMO ? (process.env.DEMO_BASE ?? '/birthday-tracker/') : '/',
+  /**
+   * Los Retratos del demo son archivos del repo; los de la app de verdad viven
+   * en el volumen y los sirve `servidor/produccion.mjs`.
+   *
+   * Por eso la carpeta pública existe sólo en el demo. Con la de Vite por
+   * defecto (`public/`), esas fotos se copiaban **también al build normal** y
+   * terminaban adentro de la imagen Docker de cualquiera que autohospede.
+   */
+  publicDir: DEMO ? rutaDe('./src/demo/publico') : false,
   define: { 'import.meta.env.VITE_DEMO': JSON.stringify(DEMO) },
   resolve: {
     alias: [
@@ -72,6 +81,14 @@ export default defineConfig({
     // hidrata en el cliente, y con eso `/2026-06-24` anda igual. GitHub Pages
     // no tiene fallback de SPA, así que el workflow copia esa cáscara a
     // `404.html`, que es lo que Pages sirve cuando no encuentra el archivo.
+    // `spa` emite la cáscara que hidrata en el cliente, y `prerender` es lo que
+    // dispara su generación: con `spa` solo, no sale `_shell.html`.
+    //
+    // OJO con el base: esto anda con `/birthday-tracker/` y **falla con `/`**,
+    // porque el crawler llega a `/admin` y ahí no hay servidor que responda.
+    // O sea que ponerle un dominio propio al demo rompe el build. Se probaron
+    // `crawlLinks: false` y un `filter` a la raíz, y los dos dejan de emitir la
+    // cáscara. Si algún día hace falta, la salida es mirar `spa.prerender`.
     DEMO
       ? tanstackStart({ spa: { enabled: true }, prerender: { enabled: true } })
       : tanstackStart(),
