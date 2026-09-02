@@ -246,14 +246,112 @@
   pointer-events: none;
 }
 
+/* --- Globos --------------------------------------------------------------- */
+
+/*
+ * La capa por donde suben. Va detrás del contenido a propósito: a cuatro metros
+ * de un televisor, algo cruzando por delante del nombre le cuesta legibilidad,
+ * y por detrás da profundidad sin cobrar nada. El `isolate` de la pantalla es
+ * lo que hace que el z-index negativo quede detrás del texto y no detrás del
+ * fondo del `body`, que es donde terminaría suelto.
+ */
+.globos {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  /* Nada de lo que pase acá adentro puede tocar el layout de la pantalla. */
+  contain: layout paint;
+
+  /*
+   * Los tres colores del Gorrito y ninguno más. El arcoíris es el default de la
+   * papelería infantil y pelearía con el rosa y crema de la app; reusar los del
+   * gorrito hace que el globo y el gorro se lean del mismo mundo.
+   *
+   * El segundo de cada par es el tono apagado del tema oscuro. Son más apagados
+   * y no más claros: un color pleno sobre el fondo casi negro, en una oficina
+   * vacía de noche, quema.
+   */
+  --globo-a: light-dark(#ff7a59, #c96a55);
+  --globo-b: light-dark(#e0245e, #b04e72);
+  --globo-c: light-dark(#ffd166, #c8a555);
+}
+
+.globo {
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline-start: var(--x);
+  /*
+   * Mismo motivo que los techos altos del Retrato: el destino es un televisor
+   * de 2500px que se mira de lejos, y un globo de cuarenta píxeles allá es una
+   * pelusa. La escala por globo varía el tamaño sin repetir el `clamp`.
+   */
+  width: calc(var(--escala) * clamp(3rem, 8.5vmin, 11rem));
+  animation: globo-sube var(--subida) linear var(--salida) both;
+}
+
+/*
+ * Lineal, no `ease`: un globo con helio llega a su velocidad enseguida —el
+ * rozamiento equilibra el empuje— y de ahí sube parejo. Una curva acá se ve
+ * como un globo tirado de un hilo, no como uno que se soltó.
+ *
+ * El recorrido es exacto en las dos puntas: `100%` lo deja entero abajo del
+ * cuadro y `-100dvh`, desde `bottom: 0`, le deja el borde de abajo en el borde
+ * de arriba. Ni un píxel animándose fuera de la vista.
+ */
+@keyframes globo-sube {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(-100dvh);
+  }
+}
+
+/*
+ * El vaivén va en un hijo para que no pelee con la subida: dos `transform` en
+ * el mismo elemento se pisan.
+ *
+ * `alternate` con `ease-in-out` es un péndulo: frena en las puntas y acelera en
+ * el medio. La `--fase` en negativo arranca a cada uno en otro punto del arco,
+ * si no se hamacan todos al unísono; ese arranque pasa abajo del cuadro y no se
+ * ve. Y `infinite` no contradice nada: dura lo que dura la subida, porque el
+ * padre se desmonta cuando la tanda termina.
+ */
+.globo-bamboleo {
+  display: block;
+  transform-origin: 50% 70%;
+  animation: globo-bambolea var(--bamboleo) ease-in-out calc(-1 * var(--fase)) infinite alternate;
+}
+
+@keyframes globo-bambolea {
+  from {
+    transform: translateX(-11%) rotate(-5deg);
+  }
+  to {
+    transform: translateX(11%) rotate(5deg);
+  }
+}
+
 /*
  * Movimiento reducido no es cero animación: se conserva el fundido, que ayuda
  * a entender que algo cambió, y se saca todo lo que se desplaza o escala.
- * El confeti se cancela desde JS.
+ * El confeti y los Globos se cancelan desde JS.
  */
 @media (prefers-reduced-motion: reduce) {
   .aparece {
     animation: fundir 200ms ease both;
+  }
+
+  /*
+   * Con la guarda de `Globos.tsx` acá no llega a haber nada que esconder. Esto
+   * es el respaldo por si alguna vez se renderizan del lado del servidor: son
+   * la única animación de la app que no se puede degradar a un fundido, porque
+   * lo que molesta es justamente el objeto grande cruzando toda la pantalla.
+   */
+  .globos {
+    display: none;
   }
 
   /*

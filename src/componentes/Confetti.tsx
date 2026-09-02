@@ -1,8 +1,13 @@
 import confetti from 'canvas-confetti';
 import { useEffect } from 'react';
 
-/** Lo que tarda el Retrato en terminar de entrar, de `estilos.css`. */
-const RETRASO_MS = 320;
+/**
+ * Lo que tarda el Retrato en terminar de entrar, de `estilos.css`.
+ *
+ * Lo comparte con los Globos, que salen en el mismo instante. Separados aunque
+ * sea por poco se leen como dos eventos sueltos en vez de uno solo.
+ */
+export const RETRASO_DEL_FESTEJO_MS = 320;
 
 interface Props {
   /** Cambiar esta clave vuelve a disparar. Sirve para el cruce de medianoche. */
@@ -27,7 +32,7 @@ export function Confetti({ clave }: Props) {
       const comun = { particleCount: 70, spread: 70, startVelocity: 45, ticks: 260 };
       confetti({ ...comun, origin: { x: 0.1, y: 0.75 }, angle: 60 });
       confetti({ ...comun, origin: { x: 0.9, y: 0.75 }, angle: 120 });
-    }, RETRASO_MS);
+    }, RETRASO_DEL_FESTEJO_MS);
 
     return () => {
       clearTimeout(id);

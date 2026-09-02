@@ -84,6 +84,14 @@ Movimiento reducido conserva la cascada pero se queda solo con el fundido; el cr
 
 Los dígitos de la cuenta regresiva **no** se animan, a propósito: cambian una vez por segundo y animarlos los haría ilegibles.
 
+Los **Globos** son la única animación que se repite sola, y el porqué está en `Globos.tsx`. Tres cosas que se rompen fácil:
+
+- **No flotan: suben una vez y se van.** El bucle es lo que la TV prendida ocho horas no soporta, igual que el confeti continuo. Lo que se repite es la *tanda*, cada media hora, no el globo.
+- **El intervalo lo comparten con la revalidación de datos** (`INTERVALO_DE_FONDO_MS`, en `frescura.ts`). Es el mismo número a propósito: los dos existen porque una pantalla que nadie toca no dispara `focus`.
+- **Nacen vacíos en el servidor** y todo se decide en el cliente. Es lo que resuelve a la vez el movimiento reducido —que el servidor no puede conocer— y la hidratación. Por eso tampoco hay `Math.random()` en la configuración: hay guardas en `Globos.test.ts`.
+
+El confeti **no** acompaña las repeticiones: la llegada es el momento grande y las vueltas son recordatorios.
+
 ### La cuenta regresiva y la hidratación
 
 Los números de `CuentaRegresiva` llevan `suppressHydrationWarning`. **No lo saques.** Son la hora: el servidor los pinta en un segundo y el navegador hidrata en el siguiente, así que nunca coinciden. Sin eso, React da la hidratación por fallida y **reconstruye toda la pantalla en el cliente**, dejando una ventana en la que los clics no hacen nada — el síntoma es que "Ver todos los cumpleaños" no abre.

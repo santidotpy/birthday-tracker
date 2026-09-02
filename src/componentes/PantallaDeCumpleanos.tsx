@@ -5,11 +5,17 @@ import type { FechaSimple } from '../domain/fechas.js';
 import { Agenda } from './Agenda.js';
 import { Confetti } from './Confetti.js';
 import { CuentaRegresiva } from './CuentaRegresiva.js';
+import { Globos } from './Globos.js';
 import { Retrato } from './Retrato.js';
 import { comoISO, enCuantosDias, fechaCorta, fechaLarga, unirNombres } from './formato.js';
 
+/**
+ * `isolate` es por los Globos: los pone en su propio contexto de apilado, así
+ * el z-index negativo de la capa los deja detrás del contenido de la pantalla
+ * en vez de detrás del fondo del documento, que es donde terminarían sueltos.
+ */
 const PANTALLA =
-  'flex min-h-dvh flex-col items-center justify-center gap-5 p-6 text-center sm:gap-8 sm:p-10 2xl:gap-12';
+  'isolate flex min-h-dvh flex-col items-center justify-center gap-5 p-6 text-center sm:gap-8 sm:p-10 2xl:gap-12';
 
 /**
  * El orden en que llega cada pieza. Setenta milisegundos entre una y otra:
@@ -77,9 +83,15 @@ function Celebracion({
       {/*
         El festejo es de hoy, no de la fecha que se esté mirando. Navegar al
         cumpleaños de la semana pasada tiene que mostrar de quién fue, no
-        volver a festejarlo: sin confeti y sin saludo, que en pasado no va.
+        volver a festejarlo: sin confeti, sin globos y sin saludo, que en pasado
+        no va.
       */}
-      {esHoy && <Confetti clave={comoISO(fecha)} />}
+      {esHoy && (
+        <>
+          <Confetti clave={comoISO(fecha)} />
+          <Globos clave={comoISO(fecha)} />
+        </>
+      )}
 
       {!esHoy && (
         <p

@@ -19,8 +19,20 @@ import {
 /** Margen para no leer el día anterior si el reloj despierta justo en el límite. */
 const MARGEN_MS = 1_000;
 
-/** Cada media hora. Los datos cambian pocas veces al año; esto es de sobra. */
-const INTERVALO_DE_DATOS_MS = 30 * 60 * 1_000;
+/**
+ * El pulso de fondo: cada media hora pasa algo sin que nadie toque nada.
+ *
+ * Lo comparten la revalidación de datos y los Globos, y no es casualidad que
+ * sea el mismo número: los dos existen por el mismo motivo —una pantalla que
+ * nadie toca nunca dispara `focus` ni `visibilitychange`— y los dos se calibran
+ * contra la misma pregunta, cada cuánto vale la pena que la pantalla se mueva
+ * sola. Si cambia uno, cambia el otro.
+ *
+ * Para los datos es de sobra: cambian pocas veces al año. Para los Globos es el
+ * límite de arriba: trece segundos de movimiento dos veces por hora es menos
+ * del uno por ciento del tiempo, que es un evento raro y no un bucle.
+ */
+export const INTERVALO_DE_FONDO_MS = 30 * 60 * 1_000;
 
 /**
  * Hoy en Argentina, recalculado solo al cruzar la medianoche.
@@ -88,7 +100,7 @@ export function useDatosFrescos(): void {
       if (document.visibilityState === 'visible') refrescar();
     }
 
-    const intervalo = setInterval(refrescar, INTERVALO_DE_DATOS_MS);
+    const intervalo = setInterval(refrescar, INTERVALO_DE_FONDO_MS);
     document.addEventListener('visibilitychange', alVolver);
     window.addEventListener('focus', alVolver);
 
