@@ -39,6 +39,15 @@ export function ProveedorDeTema({ inicial, children }: { inicial: Tema; children
   const elegir = useCallback((nuevo: Tema) => {
     document.cookie = cookieDeTema(nuevo);
 
+    const html = document.documentElement;
+
+    // Apaga las transiciones propias de cada elemento mientras dura el cambio.
+    // Sin esto el diálogo se oscurece por partes: los componentes de shadcn
+    // traen `transition-colors` y el panel lleva `transition: all 200ms`, así
+    // que cada uno interpola por su cuenta y termina después del crossfade. El
+    // detalle largo está en `estilos.css`, en `.cambiando-tema`.
+    html.classList.add('cambiando-tema');
+
     // Sin transición, el fondo salta de golpe: en esta app eso es un fogonazo
     // de pantalla completa —de casi blanco a casi negro—, que es justo el
     // cambio brusco de brillo que hay que evitar. Un crossfade lo suaviza sin
@@ -49,14 +58,27 @@ export function ProveedorDeTema({ inicial, children }: { inicial: Tema; children
     // en la misma captura que el cambio de tema, para que las dos cosas pasen
     // en el mismo cuadro en vez de una atrás de la otra.
     if (!document.startViewTransition) {
-      setTema(nuevo);
+      flushSync(() => setTema(nuevo));
+      estampar(nuevo);
+      // Leer el layout obliga al navegador a recalcular los estilos ahora, con
+      // las transiciones ya apagadas. Sacando la clase antes de eso, los nuevos
+      // colores serían el primer valor que mira y arrancarían igual.
+      void html.offsetHeight;
+      html.classList.remove('cambiando-tema');
       return;
     }
 
-    document.startViewTransition(() => {
+    const transicion = document.startViewTransition(() => {
       flushSync(() => setTema(nuevo));
       estampar(nuevo);
     });
+
+    // Al terminar el cruce los colores ya están donde tienen que estar, así que
+    // devolver las transiciones no dispara ninguna. `finished` rechaza si el
+    // cruce se saltea —otro cambio de tema encima—; también ahí hay que sacarla.
+    void transicion.finished
+      .finally(() => html.classList.remove('cambiando-tema'))
+      .catch(() => {});
   }, []);
 
   return <Contexto.Provider value={{ tema, elegir }}>{children}</Contexto.Provider>;

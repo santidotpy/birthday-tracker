@@ -185,6 +185,35 @@
   animation-timing-function: var(--sale);
 }
 
+/*
+ * Y mientras cruza, nadie interpola por su cuenta.
+ *
+ * El párrafo de arriba dice que un `transition` sobre los colores no serviría.
+ * El problema es que muchos elementos traen el suyo igual: los componentes de
+ * shadcn vienen con `transition-colors` o `transition-all`, y el panel del
+ * diálogo lleva `duration-200` sin `transition-property`, que en CSS es
+ * `transition: all 200ms`.
+ *
+ * Con eso puesto, el crossfade se rompe en dos tiempos. La captura del estado
+ * nuevo se toma apenas cambia el tema, cuando esos elementos recién arrancan su
+ * propia transición: quedan retratados casi con el color viejo. Así que el
+ * documento cruza entero mientras los controles siguen en el color anterior, y
+ * recién cuando la transición termina y se ve el DOM de verdad, cada uno
+ * completa su interpolación por su lado. Se ve como si el diálogo se oscureciera
+ * por partes, que es exactamente lo que pasa.
+ *
+ * Medido: el fondo saltaba en un cuadro y el panel del diálogo tardaba 200ms,
+ * pasando por un gris que no existe en ninguno de los dos temas.
+ *
+ * La clase la pone y la saca `contexto.tsx`, que es quien sabe cuándo empieza y
+ * cuándo termina. Dura lo que dura el cruce.
+ */
+:root.cambiando-tema *,
+:root.cambiando-tema *::before,
+:root.cambiando-tema *::after {
+  transition: none !important;
+}
+
 /* --- Lo que no se expresa como utilidad ---------------------------------- */
 
 /* Nada aparece de la nada: se entra desde 0.97, nunca desde 0. */

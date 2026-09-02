@@ -74,6 +74,8 @@ Si tocás el tema, las dos piezas tienen que seguir de acuerdo: los tokens `ligh
 
 El cambio de tema pasa por `document.startViewTransition` con un `flushSync` adentro, para que el fondo no salte de golpe y para que el botón marcado del selector cambie en el mismo cuadro. Ese crossfade **no** va adentro de `prefers-reduced-motion`: es opacidad pura y suavizar el salto de brillo le importa más a quien pidió menos movimiento.
 
+Mientras cruza, `contexto.tsx` pone `.cambiando-tema` en el `<html>` y `estilos.css` apaga con eso **todas** las transiciones. No es opcional: los componentes de shadcn traen `transition-colors`, y el panel del diálogo lleva `duration-200` sin `transition-property`, que en CSS es `transition: all 200ms`. Con eso puesto, la captura del estado nuevo sale con esos elementos todavía en el color viejo, y cada uno completa su interpolación **después** del crossfade — el diálogo se oscurece por partes. Hay guardas en `src/tema/contexto.test.ts`.
+
 La paleta de iniciales (`src/retratos/iniciales.ts`) son **pares**, uno por tema, porque los colores que llevan texto blanco son todos oscuros y en tema oscuro el círculo del Retrato desaparecía contra el fondo. Los tests verifican contraste contra la tinta *y* contra el fondo de cada tema; si agregás un color, ellos deciden si entra.
 
 ### Motion
