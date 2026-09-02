@@ -84,11 +84,9 @@ export default defineConfig({
     // `spa` emite la cáscara que hidrata en el cliente, y `prerender` es lo que
     // dispara su generación: con `spa` solo, no sale `_shell.html`.
     //
-    // OJO con el base: esto anda con `/birthday-tracker/` y **falla con `/`**,
-    // porque el crawler llega a `/admin` y ahí no hay servidor que responda.
-    // O sea que ponerle un dominio propio al demo rompe el build. Se probaron
-    // `crawlLinks: false` y un `filter` a la raíz, y los dos dejan de emitir la
-    // cáscara. Si algún día hace falta, la salida es mirar `spa.prerender`.
+    // El base sale del workflow y anda con cualquiera de los dos: `/<repo>/`
+    // cuando el sitio va en `usuario.github.io`, y `/` cuando hay dominio
+    // propio y el sitio queda en la raíz. Los dos están probados.
     DEMO
       ? tanstackStart({ spa: { enabled: true }, prerender: { enabled: true } })
       : tanstackStart(),
